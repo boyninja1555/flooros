@@ -169,7 +169,7 @@ int main()
         getcwd(cwd, sizeof(cwd));
         cwd[sizeof(cwd) - 1] = '\0';
 
-        printf("sf@FloorOS:%s$ ", cwd);
+        printf("\x1b[32msf@FloorOS\x1b[0m:\x1b[34m%s\x1b[0m$ ", cwd);
         fflush(stdout);
 
         char command[MAX_COMMAND_LENGTH];
