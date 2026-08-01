@@ -6,5 +6,5 @@ if [ "$PWD" != "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd )" ]; then
 fi
 SOURCE=rootfs/
 echo -e "\033[34mInitializing $SOURCE...\033[0m"
-mkdir -p $SOURCE/{dev,proc,sys,tmp}
+mkdir -p $SOURCE/{bin,dev,proc,sys,tmp}
 echo -e "\033[34mInitialized $SOURCE!\033[0m"
