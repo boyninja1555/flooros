@@ -11,5 +11,6 @@ for filepath in src/*.c; do
     basename="${filepath##*/}"
     basename="${basename%.c}"
     gcc -static src/$basename.c -o ../rootfs/bin/$basename
+    echo "Built $basename.c to rootfs!"
 done
-echo -e "\033[34mBuilt butools to rootfs!\033[0m"
+echo -e "\033[34mFinished building butools to rootfs!\033[0m"
