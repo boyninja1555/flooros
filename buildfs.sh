@@ -7,9 +7,7 @@ fi
 SOURCE=rootfs/
 TARGET=initramfs.img
 echo -e "\033[34mBuilding $SOURCE...\033[0m"
-if [ ! -f "$SOURCE" ]; then
-    mkdir -p $SOURCE/{dev,proc,sys,tmp}
-fi
+./initfs.sh
 if [ ! -f "$SOURCE/init" ]; then
     cd sysfloor
     ./build.sh
