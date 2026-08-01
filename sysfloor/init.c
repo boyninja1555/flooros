@@ -16,8 +16,8 @@ void spawn_shell()
     pid_t pid = fork();
     if (pid == 0)
     {
-        char *args[] = {"/usr/bin/sh", NULL};
-        execv("/usr/bin/sh", args);
+        char *args[] = {"/bin/sf", NULL};
+        execv("/bin/sf", args);
         perror("exec shell");
         exit(1);
     }
@@ -29,7 +29,7 @@ void spawn_shell()
         if (pid == -1)
             break;
 
-        printf("process exited\n");
+        printf("Process exited with status %d\n", WEXITSTATUS(status));
         if (WIFEXITED(status))
             spawn_shell();
     }

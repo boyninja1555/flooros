@@ -12,6 +12,11 @@ if [ ! -f "$SOURCE/init" ]; then
     ./build.sh
     cd ..
 fi
+if [ ! -f "$SOURCE/bin/sf" ]; then
+    cd shellyfloor
+    ./build.sh
+    cd ..
+fi
 cd $SOURCE
 find . -print | cpio -ov -H newc > ../initramfs.img
 cd ..
