@@ -4,11 +4,12 @@ int main(int argc, const char *argv[])
 {
     for (int i = 1; i < argc; i++)
     {
-        printf("%s", argv[i]);
-        if (i < argc - 1)
-            printf(" ");
+        if (i > 1)
+            putchar(' ');
+
+        fputs(argv[i], stdout);
     }
 
-    printf("\n");
+    putchar('\n');
     return 0;
 }
