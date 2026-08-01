@@ -7,16 +7,6 @@ fi
 SOURCE=rootfs/
 TARGET=initramfs.img
 echo -e "\033[34mBuilding $SOURCE...\033[0m"
-if [ ! -f "$SOURCE/init" ]; then
-    cd sysfloor
-    ./build.sh
-    cd ..
-fi
-if [ ! -f "$SOURCE/bin/sf" ]; then
-    cd shellyfloor
-    ./build.sh
-    cd ..
-fi
 cd $SOURCE
 find . -print | cpio -ov -H newc > ../initramfs.img
 cd ..
