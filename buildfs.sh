@@ -13,5 +13,7 @@ if [ ! -f "$SOURCE/init" ]; then
     ./build.sh
     cd ..
 fi
-find rootfs -print | cpio -ov -H newc > initramfs.img
+cd $SOURCE
+find . -print | cpio -ov -H newc > ../initramfs.img
+cd ..
 echo -e "\033[34mBuilt $SOURCE to $TARGET!\033[0m"

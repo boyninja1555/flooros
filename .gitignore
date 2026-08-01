@@ -1,3 +1,5 @@
+vmlinuz-*
+
 # Build files
 *.img
 rootfs/init
