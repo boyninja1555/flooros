@@ -1,3 +1,4 @@
+#include <linux/limits.h>
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -162,7 +163,7 @@ static int spawn_process(char *cwd, int argc, char *argv[])
 
 int main()
 {
-    char cwd[4096];
+    char cwd[PATH_MAX];
     while (1)
     {
         getcwd(cwd, sizeof(cwd));
@@ -202,9 +203,7 @@ int main()
             return status;
         }
 
-        int status = spawn_process(cwd, token_count, argv);
-        if (status != 0)
-            printf("Process exited with status %d\n", WEXITSTATUS(status));
+        spawn_process(cwd, token_count, argv);
     }
 
     return 0;
