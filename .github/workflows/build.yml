@@ -29,7 +29,8 @@ jobs:
             cpio \
             xorriso \
             grub-pc-bin \
-            grub-common
+            grub-common \
+            mtools
 
       - name: Initialize root filesystem
         run: |
