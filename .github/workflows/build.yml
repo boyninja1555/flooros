@@ -1,0 +1,138 @@
+name: Build FloorOS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            gcc \
+            make \
+            cpio \
+            xorriso \
+            grub-pc-bin \
+            grub-common
+
+      - name: Initialize root filesystem
+        run: |
+          chmod +x initfs.sh
+          ./initfs.sh
+
+      - name: Build sysfloor
+        run: |
+          chmod +x sysfloor/build.sh
+          cd sysfloor
+          ./build.sh
+
+      - name: Build shellyfloor
+        run: |
+          chmod +x shellyfloor/build.sh
+          cd shellyfloor
+          ./build.sh
+
+      - name: Build butools
+        run: |
+          chmod +x butools/build.sh
+          cd butools
+          ./build.sh
+
+      - name: Build initramfs
+        run: |
+          chmod +x buildfs.sh
+          ./buildfs.sh
+
+      - name: Copy host kernel
+        run: |
+          chmod +x copykernel.sh
+          ./copykernel.sh
+
+      - name: Create GRUB ISO tree
+        run: |
+          mkdir -p iso/boot/grub
+          cp initramfs.img iso/boot/initramfs.img
+          cp vmlinuz-* iso/boot/vmlinuz
+
+          cat > iso/boot/grub/grub.cfg <<EOF
+          set timeout=0
+          set default=0
+
+          menuentry "FloorOS" {
+              linux /boot/vmlinuz console=ttyS0 boot=casper
+              initrd /boot/initramfs.img
+          }
+          EOF
+
+      - name: Build bootable ISO
+        run: |
+          grub-mkrescue \
+            -o flooros.iso \
+            iso
+
+      - name: Determine release version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch --tags
+          DATE_TAG=$(date -u +%Y.%m.%d)
+          DATE_TITLE=$(date -u +%Y.%m.%d)
+          LAST=$(git tag \
+            | grep "^${DATE_TAG}-" \
+            | sed "s/^${DATE_TAG}-//" \
+            | sort -n \
+            | tail -n1)
+
+          if [ -z "$LAST" ]; then
+            BUILD=1
+          else
+            BUILD=$((10#$LAST + 1))
+          fi
+
+          if [ "$BUILD" -gt 99 ]; then
+            echo "Daily build limit reached."
+            exit 1
+          fi
+
+          BUILD=$(printf "%02d" "$BUILD")
+          TAG="${DATE_TAG}-${BUILD}"
+          TITLE="FloorOS ${DATE_TITLE}-${BUILD}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create \
+            "${{ steps.version.outputs.tag }}" \
+            flooros.iso \
+            initramfs.img \
+            --title "${{ steps.version.outputs.title }}" \
+            --generate-notes
