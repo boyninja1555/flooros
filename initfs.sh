@@ -7,4 +7,5 @@ fi
 SOURCE=rootfs/
 echo -e "\033[34mInitializing $SOURCE...\033[0m"
 mkdir -p $SOURCE/{bin,dev,proc,sys,tmp}
+mkdir -p $SOURCE/dev/pts
 echo -e "\033[34mInitialized $SOURCE!\033[0m"
