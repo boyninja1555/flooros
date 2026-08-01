@@ -84,7 +84,7 @@ jobs:
       - name: Build bootable ISO
         run: |
           grub-mkrescue \
-            -o flooros.iso \
+            -o FloorOS.iso \
             iso
 
       - name: Determine release version
@@ -133,7 +133,7 @@ jobs:
         run: |
           gh release create \
             "${{ steps.version.outputs.tag }}" \
-            flooros.iso \
+            FloorOS.iso \
             initramfs.img \
             --title "${{ steps.version.outputs.title }}" \
             --generate-notes
