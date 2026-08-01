@@ -5,4 +5,4 @@ if [ "$PWD" != "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd )" ]; then
     exit 1
 fi
 ./buildfs.sh
-qemu-system-x86_64 -kernel ./vmlinuz-$(uname -r) -initrd initramfs.img -append "console=ttyS0 boot=casper" -nographic
+qemu-system-x86_64 -kernel ./vmlinuz-$(uname -r) -initrd initramfs.img -append "console=ttyS0" -nographic
