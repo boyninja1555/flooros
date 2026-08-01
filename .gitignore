@@ -1,0 +1,9 @@
+# Build files
+*.img
+rootfs/init
+
+# Env
+.vscode/
+.idea/
+*.iml
+.DS_Store
