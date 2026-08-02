@@ -24,26 +24,26 @@ static void setup_filesystem()
     printf("Filesystem initialized!\n");
 }
 
-static int start_console()
-{
-    pid_t pid = fork();
-
-    if (pid == 0)
-    {
-        char *args[] = {"/bin/console", NULL};
-        execv(args[0], args);
-        perror("console");
-        _exit(1);
-    }
-
-    if (pid < 0)
-    {
-        perror("console fork");
-        return -1;
-    }
-
-    return 0;
-}
+// static int start_console()
+// {
+//     pid_t pid = fork();
+//
+//     if (pid == 0)
+//     {
+//         char *args[] = {"/bin/console", NULL};
+//         execv(args[0], args);
+//         perror("console");
+//         _exit(1);
+//     }
+//
+//     if (pid < 0)
+//     {
+//         perror("console fork");
+//         return -1;
+//     }
+//
+//     return 0;
+// }
 
 static int attach_console()
 {
@@ -103,11 +103,11 @@ static void spawn_shell()
 int main()
 {
     setup_filesystem();
-    start_console();
+    // start_console();
     sleep(1);
     attach_console();
-    printf("\033[2J");
-    printf("\033[H");
+    // printf("\033[2J");
+    // printf("\033[H");
     printf("\033[1;31mFloorOS x Shellyfloor (sf)\033[0m\n");
     spawn_shell();
     printf("System halted!\n");

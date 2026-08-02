@@ -21,12 +21,13 @@ int compare_entries(const void *a, const void *b)
     return strcmp(ea->name, eb->name);
 }
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
-    if (argc < 2)
-        argv = (const char *[]){argv[0], "."};
+    char *dirpath = ".";
+    if (argc > 1)
+        dirpath = argv[1];
 
-    DIR *directory = opendir(argv[1]);
+    DIR *directory = opendir(dirpath);
     if (!directory)
     {
         perror("opendir");

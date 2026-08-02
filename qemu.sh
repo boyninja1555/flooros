@@ -5,3 +5,4 @@ if [ "$PWD" != "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd )" ]; then
     exit 1
 fi
 qemu-system-x86_64 -kernel ./vmlinuz-$(uname -r) -initrd initramfs.img -append "console=ttyS0" -nographic
+#qemu-system-x86_64 -kernel ./vmlinuz-$(uname -r) -initrd initramfs.img -vga std
