@@ -1,10 +1,8 @@
 #include <sys/reboot.h>
 #include <unistd.h>
-#include <stdio.h>
 
-int main()
+int main(void)
 {
-    printf("Shutting down...\n");
     sync();
     reboot(RB_POWER_OFF);
     return 0;
