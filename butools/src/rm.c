@@ -34,11 +34,11 @@ static int remove_recursive(const char *path)
         return 1;
     }
 
-    char msg[PATH_MAX + 64];
+    char message[PATH_MAX + 64];
     if (!S_ISDIR(st.st_mode))
     {
-        snprintf(msg, sizeof(msg), "Delete file \"%s\"?", path);
-        if (!input_yn(msg, false))
+        snprintf(message, sizeof(message), "Delete file \"%s\"?", path);
+        if (!input_yn(message, false))
             return 0;
 
         if (unlink(path) != 0)
@@ -65,8 +65,8 @@ static int remove_recursive(const char *path)
             continue;
 
         char subpath[PATH_MAX];
-        int len = snprintf(subpath, sizeof(subpath), "%s/%s", path, entry->d_name);
-        if (len < 0 || (size_t)len >= sizeof(subpath))
+        int length = snprintf(subpath, sizeof(subpath), "%s/%s", path, entry->d_name);
+        if (length < 0 || (size_t)length >= sizeof(subpath))
         {
             fprintf(stderr, "Path exceeds maximum length! %s/%s\n", path, entry->d_name);
             status = 1;
@@ -78,8 +78,8 @@ static int remove_recursive(const char *path)
     }
 
     closedir(directory);
-    snprintf(msg, sizeof(msg), "Delete directory \"%s\"?", path);
-    if (!input_yn(msg, false))
+    snprintf(message, sizeof(message), "Delete directory \"%s\"?", path);
+    if (!input_yn(message, false))
         return status;
 
     if (rmdir(path) != 0)
@@ -138,9 +138,9 @@ int main(int argc, char *argv[])
         }
         else
         {
-            char msg[PATH_MAX + 64];
-            snprintf(msg, sizeof(msg), "Delete file \"%s\"?", argv[i]);
-            if (!input_yn(msg, false))
+            char message[PATH_MAX + 64];
+            snprintf(message, sizeof(message), "Delete file \"%s\"?", argv[i]);
+            if (!input_yn(message, false))
                 continue;
 
             if (unlink(argv[i]) != 0)
