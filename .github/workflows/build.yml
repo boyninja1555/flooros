@@ -22,15 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            gcc \
-            make \
-            cpio \
-            xorriso \
-            grub-pc-bin \
-            grub-common \
-            mtools
+          sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-common mtools
 
       - name: Initialize root filesystem
         run: |
@@ -76,16 +68,14 @@ jobs:
           set default=0
 
           menuentry "FloorOS" {
-              linux /boot/vmlinuz console=ttyS0 boot=casper
+              linux /boot/vmlinuz console=tty0 console=ttyS0
               initrd /boot/initramfs.img
           }
           EOF
 
       - name: Build bootable ISO
         run: |
-          grub-mkrescue \
-            -o FloorOS.iso \
-            iso
+          grub-mkrescue -o FloorOS.iso iso
 
       - name: Determine release version
         id: version
@@ -95,11 +85,7 @@ jobs:
           git fetch --tags
           DATE_TAG=$(date -u +%Y.%m.%d)
           DATE_TITLE=$(date -u +%Y.%m.%d)
-          LAST=$(git tag \
-            | grep "^${DATE_TAG}-" \
-            | sed "s/^${DATE_TAG}-//" \
-            | sort -n \
-            | tail -n1)
+          LAST=$(git tag | grep "^${DATE_TAG}-" | sed "s/^${DATE_TAG}-//" | sort -n | tail -n1)
 
           if [ -z "$LAST" ]; then
             BUILD=1
@@ -131,9 +117,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create \
-            "${{ steps.version.outputs.tag }}" \
-            FloorOS.iso \
-            initramfs.img \
-            --title "${{ steps.version.outputs.title }}" \
-            --generate-notes
+          gh release create "${{ steps.version.outputs.tag }}" FloorOS.iso initramfs.img --title "${{ steps.version.outputs.title }}" --generate-notes
