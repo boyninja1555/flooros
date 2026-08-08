@@ -32,7 +32,7 @@ static int attach_console()
     if (console < 0)
     {
         perror("open console");
-        return -1;
+        return 1;
     }
 
     dup2(console, STDIN_FILENO);
@@ -85,9 +85,10 @@ int main()
 {
     setup_filesystem();
     sleep(1);
-    attach_console();
-    // printf("\033[2J");
-    // printf("\033[H");
+
+    if (attach_console() == 0)
+        printf("\033[2J\033[H");
+
     printf("\033[1;31mFloorOS x Shellyfloor (sf)\033[0m\n");
     spawn_shell();
     printf("System halted!\n");
