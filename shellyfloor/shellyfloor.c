@@ -1,7 +1,9 @@
 #include <linux/limits.h>
 #include <sys/wait.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -14,6 +16,9 @@ typedef enum
 {
     TOKEN_WORD,
     TOKEN_PIPE,
+    TOKEN_REDIRECT_IN,
+    TOKEN_REDIRECT_OUT,
+    TOKEN_REDIRECT_APPEND,
     TOKEN_TERMINATE,
 } TokenType;
 
@@ -22,6 +27,15 @@ typedef struct
     TokenType type;
     char *value;
 } Token;
+
+typedef struct
+{
+    char *argv[MAX_TOKENS + 1];
+    int argc;
+    char *infile;
+    char *outfile;
+    bool append_out;
+} CommandStage;
 
 static char token_storage[MAX_TOKENS][MAX_TOKEN_LENGTH];
 
@@ -69,7 +83,6 @@ static int lex(char *command, Token tokens[])
             if (c == '"')
             {
                 temp[temp_length] = '\0';
-
                 memcpy(token_storage[storage_index], temp, temp_length + 1);
                 tokens[token_count].type = TOKEN_WORD;
                 tokens[token_count].value = token_storage[storage_index];
@@ -118,12 +131,75 @@ static int lex(char *command, Token tokens[])
             continue;
         }
 
+        if (c == '<')
+        {
+            if (reading)
+            {
+                temp[temp_length] = '\0';
+                memcpy(token_storage[storage_index], temp, temp_length + 1);
+                tokens[token_count].type = TOKEN_WORD;
+                tokens[token_count].value = token_storage[storage_index];
+                token_count++;
+                storage_index++;
+                temp_length = 0;
+                reading = false;
+            }
+
+            if (token_count >= MAX_TOKENS || storage_index >= MAX_TOKENS)
+                return token_count;
+
+            token_storage[storage_index][0] = '<';
+            token_storage[storage_index][1] = '\0';
+            tokens[token_count].type = TOKEN_REDIRECT_IN;
+            tokens[token_count].value = token_storage[storage_index];
+            token_count++;
+            storage_index++;
+            continue;
+        }
+
+        if (c == '>')
+        {
+            if (reading)
+            {
+                temp[temp_length] = '\0';
+                memcpy(token_storage[storage_index], temp, temp_length + 1);
+                tokens[token_count].type = TOKEN_WORD;
+                tokens[token_count].value = token_storage[storage_index];
+                token_count++;
+                storage_index++;
+                temp_length = 0;
+                reading = false;
+            }
+
+            if (token_count >= MAX_TOKENS || storage_index >= MAX_TOKENS)
+                return token_count;
+
+            if (command[i + 1] == '>')
+            {
+                i++;
+                token_storage[storage_index][0] = '>';
+                token_storage[storage_index][1] = '>';
+                token_storage[storage_index][2] = '\0';
+                tokens[token_count].type = TOKEN_REDIRECT_APPEND;
+            }
+            else
+            {
+                token_storage[storage_index][0] = '>';
+                token_storage[storage_index][1] = '\0';
+                tokens[token_count].type = TOKEN_REDIRECT_OUT;
+            }
+
+            tokens[token_count].value = token_storage[storage_index];
+            token_count++;
+            storage_index++;
+            continue;
+        }
+
         if (c == ' ' || c == '\t')
         {
             if (reading)
             {
                 temp[temp_length] = '\0';
-
                 memcpy(token_storage[storage_index], temp, temp_length + 1);
                 tokens[token_count].type = TOKEN_WORD;
                 tokens[token_count].value = token_storage[storage_index];
@@ -189,7 +265,37 @@ static int spawn_process(char *cwd, int argc, char *argv[])
     return 1;
 }
 
-static int execute_pipeline(char *cwd, int cmds_num, char *cmds_argv[][MAX_TOKENS + 1])
+static void apply_redirections(CommandStage *stage)
+{
+    if (stage->infile != NULL)
+    {
+        int fd = open(stage->infile, O_RDONLY);
+        if (fd < 0)
+        {
+            perror(stage->infile);
+            _exit(1);
+        }
+
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }
+
+    if (stage->outfile != NULL)
+    {
+        int flags = O_WRONLY | O_CREAT | (stage->append_out ? O_APPEND : O_TRUNC);
+        int fd = open(stage->outfile, flags, 0644);
+        if (fd < 0)
+        {
+            perror(stage->outfile);
+            _exit(1);
+        }
+
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+}
+
+static int execute_pipeline(char *cwd, int cmds_num, CommandStage stages[])
 {
     int pipefds[2 * (cmds_num - 1)];
     for (int i = 0; i < cmds_num - 1; i++)
@@ -207,14 +313,14 @@ static int execute_pipeline(char *cwd, int cmds_num, char *cmds_argv[][MAX_TOKEN
         pids[i] = fork();
         if (pids[i] == 0)
         {
+            signal(SIGINT, SIG_DFL);
+
             if (i > 0)
-            {
                 if (dup2(pipefds[(i - 1) * 2], STDIN_FILENO) < 0)
                 {
                     perror("dup2 stdin");
                     _exit(1);
                 }
-            }
 
             if (i < cmds_num - 1)
                 if (dup2(pipefds[i * 2 + 1], STDOUT_FILENO) < 0)
@@ -226,16 +332,21 @@ static int execute_pipeline(char *cwd, int cmds_num, char *cmds_argv[][MAX_TOKEN
             for (int j = 0; j < 2 * (cmds_num - 1); j++)
                 close(pipefds[j]);
 
-            if (strcmp(cmds_argv[i][0], "pwd") == 0)
+            apply_redirections(&stages[i]);
+
+            if (stages[i].argc == 0)
+                _exit(0);
+
+            if (strcmp(stages[i].argv[0], "pwd") == 0)
             {
                 printf("%s\n", cwd);
                 _exit(0);
             }
 
-            if (strcmp(cmds_argv[i][0], "cd") == 0)
+            if (strcmp(stages[i].argv[0], "cd") == 0)
                 _exit(0);
 
-            execv(cmds_argv[i][0], cmds_argv[i]);
+            execv(stages[i].argv[0], stages[i].argv);
             perror("execv");
             _exit(1);
         }
@@ -290,66 +401,94 @@ int main()
         if (token_count <= 0)
             continue;
 
-        char *cmds_argv[MAX_TOKENS][MAX_TOKENS + 1];
-        int cmds_argc[MAX_TOKENS] = {0};
+        CommandStage stages[MAX_TOKENS];
+        memset(stages, 0, sizeof(stages));
+
         int cmds_num = 0;
-        int current_arg = 0;
         bool syntax_error = false;
 
         for (int i = 0; i < token_count; i++)
         {
             if (tokens[i].type == TOKEN_PIPE)
             {
-                if (current_arg == 0)
+                if (stages[cmds_num].argc == 0 && stages[cmds_num].infile == NULL && stages[cmds_num].outfile == NULL)
                 {
-                    fprintf(stderr, "Ssyntax error near unexpected token '|'!\n");
+                    fprintf(stderr, "Syntax error near unexpected token '|'!\n");
                     syntax_error = true;
                     break;
                 }
 
-                cmds_argv[cmds_num][current_arg] = NULL;
-                cmds_argc[cmds_num] = current_arg;
+                stages[cmds_num].argv[stages[cmds_num].argc] = NULL;
                 cmds_num++;
-                current_arg = 0;
+            }
+            else if (tokens[i].type == TOKEN_REDIRECT_IN)
+            {
+                if (i + 1 >= token_count || tokens[i + 1].type != TOKEN_WORD)
+                {
+                    fprintf(stderr, "Syntax error near unexpected token '<'!\n");
+                    syntax_error = true;
+                    break;
+                }
+
+                stages[cmds_num].infile = tokens[i + 1].value;
+                i++;
+            }
+            else if (tokens[i].type == TOKEN_REDIRECT_OUT || tokens[i].type == TOKEN_REDIRECT_APPEND)
+            {
+                if (i + 1 >= token_count || tokens[i + 1].type != TOKEN_WORD)
+                {
+                    fprintf(stderr, "Syntax error near unexpected token '>'!\n");
+                    syntax_error = true;
+                    break;
+                }
+
+                stages[cmds_num].outfile = tokens[i + 1].value;
+                stages[cmds_num].append_out = (tokens[i].type == TOKEN_REDIRECT_APPEND);
+                i++;
             }
             else if (tokens[i].type == TOKEN_WORD)
-                cmds_argv[cmds_num][current_arg++] = tokens[i].value;
+                stages[cmds_num].argv[stages[cmds_num].argc++] = tokens[i].value;
         }
 
         if (syntax_error)
             continue;
 
-        if (current_arg == 0)
+        if (stages[cmds_num].argc > 0 || stages[cmds_num].infile != NULL || stages[cmds_num].outfile != NULL)
         {
-            if (cmds_num > 0)
-            {
-                fprintf(stderr, "sf: syntax error near unexpected token '|'\n");
-                continue;
-            }
-        }
-        else
-        {
-            cmds_argv[cmds_num][current_arg] = NULL;
-            cmds_argc[cmds_num] = current_arg;
+            stages[cmds_num].argv[stages[cmds_num].argc] = NULL;
             cmds_num++;
         }
 
         if (cmds_num == 0)
             continue;
 
-        if (cmds_num == 1 && strcmp(cmds_argv[0][0], "exit") == 0)
+        if (cmds_num == 1 && stages[0].argc > 0)
         {
-            int status = 0;
-            if (cmds_argc[0] > 1)
-                status = atoi(cmds_argv[0][1]);
+            if (strcmp(stages[0].argv[0], "exit") == 0)
+            {
+                int status = 0;
+                if (stages[0].argc > 1)
+                    status = atoi(stages[0].argv[1]);
 
-            return status;
+                return status;
+            }
+
+            if (strcmp(stages[0].argv[0], "cd") == 0)
+            {
+                if (stages[0].argc < 2)
+                {
+                    fprintf(stderr, "cd: missing path argument\n");
+                    continue;
+                }
+
+                if (chdir(stages[0].argv[1]) != 0)
+                    perror("cd");
+
+                continue;
+            }
         }
 
-        if (cmds_num == 1)
-            spawn_process(cwd, cmds_argc[0], cmds_argv[0]);
-        else
-            execute_pipeline(cwd, cmds_num, cmds_argv);
+        execute_pipeline(cwd, cmds_num, stages);
     }
 
     return 0;
