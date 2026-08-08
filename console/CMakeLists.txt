@@ -1,8 +1,0 @@
-cmake_minimum_required(VERSION 4.2)
-project(console C)
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_EXE_LINKER_FLAGS "-static")
-file(GLOB_RECURSE CONSOLE_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
-add_executable(console ${CONSOLE_SOURCES})
-target_include_directories(console PRIVATE include src)

@@ -27,4 +27,7 @@ cd ..
 
 # OPTIONAL: Runs QEMU using the copied kernel and the rootfs image from above
 ./qemu.sh
+
+# OPTIONAL: Runs QEMU using the copied kernel and the rootfs image from above, but instead simulating functionality much closer to real hardware
+./qemuw.sh
 ```

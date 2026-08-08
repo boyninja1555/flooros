@@ -1,4 +1,5 @@
 #include <sys/mount.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/reboot.h>
 #include <stdio.h>
@@ -19,31 +20,11 @@ static void setup_filesystem()
     mount_fs("proc", "/proc", "proc");
     mount_fs("sysfs", "/sys", "sysfs");
     mount_fs("devtmpfs", "/dev", "devtmpfs");
+    mkdir("/dev/pts", 0755);
     mount_fs("devpts", "/dev/pts", "devpts");
     mount_fs("tmpfs", "/tmp", "tmpfs");
     printf("Filesystem initialized!\n");
 }
-
-// static int start_console()
-// {
-//     pid_t pid = fork();
-//
-//     if (pid == 0)
-//     {
-//         char *args[] = {"/bin/console", NULL};
-//         execv(args[0], args);
-//         perror("console");
-//         _exit(1);
-//     }
-//
-//     if (pid < 0)
-//     {
-//         perror("console fork");
-//         return -1;
-//     }
-//
-//     return 0;
-// }
 
 static int attach_console()
 {
@@ -103,7 +84,6 @@ static void spawn_shell()
 int main()
 {
     setup_filesystem();
-    // start_console();
     sleep(1);
     attach_console();
     // printf("\033[2J");
