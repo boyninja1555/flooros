@@ -37,11 +37,8 @@ static int cat(int fd, const char *name)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
-    {
-        fprintf(stderr, "Usage: %s <path|stream>\n", argv[0]);
-        return 1;
-    }
+    if (argc == 1)
+        return cat(STDIN_FILENO, "stdin");
 
     int status = 0;
     for (int i = 1; i < argc; i++)
