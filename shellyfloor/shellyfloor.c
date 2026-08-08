@@ -50,6 +50,7 @@ static int lex(char *command, Token tokens[])
                 if (token_count >= MAX_TOKENS)
                     return token_count;
 
+                temp[temp_length] = '\0';
                 memcpy(token_storage[storage_index], temp, temp_length + 1);
                 tokens[token_count].type = TOKEN_WORD;
                 tokens[token_count].value = token_storage[storage_index];
