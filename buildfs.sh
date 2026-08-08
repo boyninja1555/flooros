@@ -8,6 +8,7 @@ SOURCE=rootfs/
 TARGET=initramfs.img
 echo -e "\033[34mBuilding $SOURCE...\033[0m"
 cd $SOURCE
+ln -sf cat bin/kitty
 find . -print | cpio -ov -H newc > ../$TARGET
 cd ..
 echo -e "\033[34mBuilt $SOURCE to $TARGET!\033[0m"
