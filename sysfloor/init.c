@@ -2,11 +2,12 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/reboot.h>
-#include <stdio.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <signal.h>
+#include <string.h>
+#include <stdio.h>
 
 static void mount_fs(const char *source, const char *target, const char *type)
 {
@@ -86,6 +87,8 @@ int main()
     setup_filesystem();
     sleep(1);
 
+    const char *hostname = "FloorOS";
+    sethostname(hostname, strlen(hostname));
     if (attach_console() == 0)
         printf("\033[2J\033[H");
 

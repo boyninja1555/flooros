@@ -165,12 +165,14 @@ static int spawn_process(char *cwd, int argc, char *argv[])
 int main()
 {
     char cwd[PATH_MAX];
+    char hostname[64];
     while (1)
     {
         getcwd(cwd, sizeof(cwd));
         cwd[sizeof(cwd) - 1] = '\0';
 
-        printf("\x1b[1;32msf@FloorOS\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", cwd);
+        gethostname(hostname, sizeof(hostname));
+        printf("\x1b[1;32msf@%s\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", hostname, cwd);
         fflush(stdout);
 
         char command[MAX_COMMAND_LENGTH];
