@@ -23,6 +23,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-efi-amd64-bin grub-common mtools flex bison bc libssl-dev libelf-dev wget
+      
+      - name: Cache bzImage
+        id: kernel-cache
+        uses: actions/cache@v4
+        with:
+          path: linux-7.1.7/arch/x86_64/boot/bzImage
+          key: kernel-bzimage-${{ hashFiles('kernel.config') }}
 
       - name: Build the entirety of FloorOS
         run: |
