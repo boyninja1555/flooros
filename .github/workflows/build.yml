@@ -68,7 +68,7 @@ jobs:
           set default=0
 
           menuentry "FloorOS" {
-              linux /boot/vmlinuz console=tty0 console=ttyS0
+              linux /boot/vmlinuz console=tty0
               initrd /boot/initramfs.img
           }
           EOF
