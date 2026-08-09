@@ -1,8 +1,11 @@
-vmlinuz-*
-
 # Build files
-*.img
+build/
 rootfs/
+*.img
+iso/
+*.iso
+linux-*/
+linux-*.tar.xz
 
 # Env
 .vscode/

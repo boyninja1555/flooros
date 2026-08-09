@@ -1,33 +1,29 @@
-To set up your local working directory for FloorOS, we recommend Linux for it's built-in kernel files we can easily copy. Each should be executed sequentially:
+To set up your local working directory for FloorOS, we recommend Linux for it's ease of development and compilation!  
+We also recommend `make` as the build system! If you go with it, there's a preset [Makefile](./Makefile) which orchestrates the whole process.
 
+
+You can choose from any of the following, as they all produce FloorOS in some form:
+
+**Option A**  
+To build and run a bootable ISO:
 ```bash
-# Initializes root file system directory structure since git won't commit empty directories
-./initfs.sh
+make run-iso
+```
 
-# Builds sysfloor (PID 1, entrypoint for everything under FloorOS)
-cd sysfloor
-./build.sh
-cd ..
+**Option B**  
+To directly run FloorOS:
+```bash
+make run
+```
 
-# Builds shellyfloor (in place of sh and bash, known as sf via command-line)
-cd shellyfloor
-./build.sh
-cd ..
+**Option C**  
+To run FloorOS directly inside your host terminal:
+```bash
+make run-dev
+```
 
-# Builds every butool (built-in shellyfloor tool), such as ls or echo
-cd butools
-./build.sh
-cd ..
-
-# Builds root file system to an image used by the kernel
-./buildfs.sh
-
-# OPTIONAL: Copies your host machine's kernel for usage with QEMU (qemu.sh)
-./copykernel.sh
-
-# OPTIONAL: Runs QEMU using the copied kernel and the rootfs image from above
-./qemu.sh
-
-# OPTIONAL: Runs QEMU using the copied kernel and the rootfs image from above, but instead simulating functionality much closer to real hardware
-./qemuw.sh
+**Option D**  
+And lastly, to build FloorOS to a bootable ISO:
+```bash
+make FloorOS.iso
 ```

@@ -19,63 +19,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-efi-amd64-bin grub-common mtools
+          sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-efi-amd64-bin grub-common mtools flex bison bc libssl-dev libelf-dev wget
 
-      - name: Initialize root filesystem
+      - name: Build the entirety of FloorOS
         run: |
-          chmod +x initfs.sh
-          ./initfs.sh
-
-      - name: Build sysfloor
-        run: |
-          chmod +x sysfloor/build.sh
-          cd sysfloor
-          ./build.sh
-
-      - name: Build shellyfloor
-        run: |
-          chmod +x shellyfloor/build.sh
-          cd shellyfloor
-          ./build.sh
-
-      - name: Build butools
-        run: |
-          chmod +x butools/build.sh
-          cd butools
-          ./build.sh
-
-      - name: Build initramfs
-        run: |
-          chmod +x buildfs.sh
-          ./buildfs.sh
-
-      - name: Copy host kernel
-        run: |
-          chmod +x copykernel.sh
-          ./copykernel.sh
-
-      - name: Create GRUB ISO tree
-        run: |
-          mkdir -p iso/boot/grub
-          cp initramfs.img iso/boot/initramfs.img
-          cp vmlinuz-* iso/boot/vmlinuz
-
-          cat > iso/boot/grub/grub.cfg <<EOF
-          set timeout=0
-          set default=0
-
-          menuentry "FloorOS" {
-              linux /boot/vmlinuz console=tty0
-              initrd /boot/initramfs.img
-          }
-          EOF
-
-      - name: Build bootable ISO
-        run: |
-          grub-mkrescue -o FloorOS.iso iso
+          make FloorOS.iso
 
       - name: Determine release version
         id: version

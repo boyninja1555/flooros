@@ -218,53 +218,6 @@ static int lex(char *command, Token tokens[])
     }
 }
 
-static int spawn_process(char *cwd, int argc, char *argv[])
-{
-    if (argc == 0)
-        return 0;
-
-    if (strcmp(argv[0], "cd") == 0)
-    {
-        if (argc < 2)
-        {
-            fprintf(stderr, "cd: missing path argument\n");
-            return 1;
-        }
-
-        if (chdir(argv[1]) != 0)
-        {
-            perror("cd");
-            return 1;
-        }
-
-        return 0;
-    }
-
-    if (strcmp(argv[0], "pwd") == 0)
-    {
-        printf("%s\n", cwd);
-        return 0;
-    }
-
-    pid_t pid = fork();
-    if (pid == 0)
-    {
-        execv(argv[0], argv);
-        perror("execv");
-        _exit(1);
-    }
-
-    if (pid > 0)
-    {
-        int status;
-        waitpid(pid, &status, 0);
-        return status;
-    }
-
-    perror("fork");
-    return 1;
-}
-
 static void apply_redirections(CommandStage *stage)
 {
     if (stage->infile != NULL)
