@@ -441,6 +441,21 @@ int main()
             }
         }
 
+        // If I ever decide to unfortuantly add a PATH thingy, this will become "outdated"
+        char *exec = stages[0].argv[0];
+        if (exec[0] != '.' && exec[0] != '/')
+        {
+            char original[strlen(exec) + 6];
+            memcpy(original, exec, strlen(exec) + 1);
+
+            // Original
+            memcpy(exec + 5, original, strlen(original));
+            exec[strlen(exec)] = '\0';
+
+            // Assumed prefix
+            memcpy(exec, "/bin/", 5);
+        }
+
         execute_pipeline(cwd, cmds_num, stages);
     }
 
