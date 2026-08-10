@@ -1,5 +1,5 @@
 CC          := gcc
-CFLAGS      := -static -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE
+CFLAGS      := -static -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE -MMD
 QEMU        := qemu-system-x86_64
 
 KERNEL_MAJ  := 7
@@ -14,9 +14,10 @@ BUTOOLS_SRC := $(shell find butools -name "*.c" 2>/dev/null)
 
 SYS_BIN     := build/init
 SHELL_BIN   := build/sf
-BUTOOLS_BIN := $(patsubst %.c, build/butools/%, $(notdir $(BUTOOLS_SRC)))
+BUTOOLS_BIN := $(patsubst butools/%.c, build/butools/%, $(BUTOOLS_SRC))
+DEPS        := $(shell find build -name "*.d" 2>/dev/null)
 
-.PHONY: all clean run run-dev run-fast
+.PHONY: all clean run run-dev run-iso
 all: FloorOS.iso
 
 $(BZIMAGE): kernel.config
@@ -37,9 +38,9 @@ $(SHELL_BIN): $(SHELL_SRC)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $^ -o $@
 
-build/butools/%:
+build/butools/%: butools/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(filter %/$*.c, $(BUTOOLS_SRC)) -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	@echo "Packing initramfs..."
@@ -75,3 +76,5 @@ run-iso: FloorOS.iso
 clean:
 	rm -rf rootfs iso build FloorOS.iso initramfs.img
 	@echo "Kernel source was NOT deleted to save time! Delete $(KERNEL_DIR) manually if needed, but generally it'd a bad idea and booooooo."
+
+-include $(DEPS)

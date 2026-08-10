@@ -25,7 +25,7 @@ static bool input_yn(const char *question, bool def)
     return def;
 }
 
-static int remove_recursive(const char *path)
+static int remove_srecursive(const char *path)
 {
     struct stat st;
     if (lstat(path, &st) != 0)
@@ -34,19 +34,13 @@ static int remove_recursive(const char *path)
         return 1;
     }
 
-    char message[PATH_MAX + 64];
     if (!S_ISDIR(st.st_mode))
     {
-        snprintf(message, sizeof(message), "Delete file \"%s\"?", path);
-        if (!input_yn(message, false))
-            return 0;
-
         if (unlink(path) != 0)
         {
             perror(path);
             return 1;
         }
-
         return 0;
     }
 
@@ -73,15 +67,11 @@ static int remove_recursive(const char *path)
             continue;
         }
 
-        if (remove_recursive(subpath) != 0)
+        if (remove_srecursive(subpath) != 0)
             status = 1;
     }
 
     closedir(directory);
-    snprintf(message, sizeof(message), "Delete directory \"%s\"?", path);
-    if (!input_yn(message, false))
-        return status;
-
     if (rmdir(path) != 0)
     {
         perror(path);
@@ -123,30 +113,33 @@ int main(int argc, char *argv[])
             continue;
         }
 
+        char message[PATH_MAX + 64];
         if (S_ISDIR(st.st_mode))
         {
             if (!recursive)
             {
                 fprintf(stderr, "%s is a directory! Use -r to delete it recursively.\n", argv[i]);
                 status = 1;
+                continue;
             }
-            else
+
+            snprintf(message, sizeof(message), "Delete directory \"%s\"?", argv[i]);
+            if (input_yn(message, false))
             {
-                if (remove_recursive(argv[i]) != 0)
+                if (remove_srecursive(argv[i]) != 0)
                     status = 1;
             }
         }
         else
         {
-            char message[PATH_MAX + 64];
             snprintf(message, sizeof(message), "Delete file \"%s\"?", argv[i]);
-            if (!input_yn(message, false))
-                continue;
-
-            if (unlink(argv[i]) != 0)
+            if (input_yn(message, false))
             {
-                perror(argv[i]);
-                status = 1;
+                if (unlink(argv[i]) != 0)
+                {
+                    perror(argv[i]);
+                    status = 1;
+                }
             }
         }
     }
