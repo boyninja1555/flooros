@@ -1,5 +1,5 @@
 CC          := gcc
-CFLAGS      := -static -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE -MMD
+CFLAGS      := -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE -MMD
 QEMU        := qemu-system-x86_64
 
 KERNEL_MAJ  := 7
@@ -45,10 +45,24 @@ build/butools/%: butools/%.c
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
-	mkdir -p rootfs/bin rootfs/dev rootfs/proc rootfs/sys
+	mkdir -p rootfs/bin rootfs/dev rootfs/proc rootfs/sys rootfs/lib
+	ln -s lib rootfs/lib64
+
+# "Important" libraries
+	cp /lib/x86_64-linux-gnu/libnss_files.so.2 rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libnss_dns.so.2 rootfs/lib/
+
 	cp $(SYS_BIN) rootfs/init
 	cp $(SHELL_BIN) rootfs/bin/sf
 	cp $(BUTOOLS_BIN) rootfs/bin/
+	@echo "Copying dynamic interpreter and shared libraries..."
+	@for bin in $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN); do \
+		for lib in $$(ldd $$bin 2>/dev/null | grep -o '/[^\ ]*'); do \
+			if [ -f "$$lib" ]; then \
+				cp -L "$$lib" rootfs/lib/ 2>/dev/null || true; \
+			fi; \
+		done; \
+	done
 	cd rootfs && find . -print0 | cpio --null -ov --format=newc > ../initramfs.img
 
 FloorOS.iso: $(BZIMAGE) initramfs.img
