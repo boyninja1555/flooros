@@ -39,7 +39,7 @@ typedef struct
 
 static char token_storage[MAX_TOKENS][MAX_TOKEN_LENGTH];
 
-static int lex(char *command, Token tokens[])
+static int tokenize(char *command, Token tokens[])
 {
     int token_count = 0;
     int storage_index = 0;
@@ -56,7 +56,7 @@ static int lex(char *command, Token tokens[])
         {
             if (in_string)
             {
-                fprintf(stderr, "Unterminated string!\n");
+                fputs("Unterminated string!\n", stderr);
                 return -1;
             }
 
@@ -64,7 +64,6 @@ static int lex(char *command, Token tokens[])
             {
                 if (token_count >= MAX_TOKENS)
                     return token_count;
-
                 temp[temp_length] = '\0';
                 memcpy(token_storage[storage_index], temp, temp_length + 1);
                 tokens[token_count].type = TOKEN_WORD;
@@ -94,7 +93,6 @@ static int lex(char *command, Token tokens[])
             }
             else if (temp_length < MAX_TOKEN_LENGTH - 1)
                 temp[temp_length++] = c;
-
             continue;
         }
 
@@ -121,7 +119,6 @@ static int lex(char *command, Token tokens[])
 
             if (token_count >= MAX_TOKENS || storage_index >= MAX_TOKENS)
                 return token_count;
-
             token_storage[storage_index][0] = '|';
             token_storage[storage_index][1] = '\0';
             tokens[token_count].type = TOKEN_PIPE;
@@ -147,7 +144,6 @@ static int lex(char *command, Token tokens[])
 
             if (token_count >= MAX_TOKENS || storage_index >= MAX_TOKENS)
                 return token_count;
-
             token_storage[storage_index][0] = '<';
             token_storage[storage_index][1] = '\0';
             tokens[token_count].type = TOKEN_REDIRECT_IN;
@@ -334,7 +330,7 @@ static int execute_pipeline(char *cwd, int cmds_num, CommandStage stages[])
     return last_status;
 }
 
-int main()
+int main(void)
 {
     char cwd[PATH_MAX];
     char hostname[64];
@@ -359,7 +355,7 @@ int main()
         }
 
         Token tokens[MAX_TOKENS];
-        int token_count = lex(command, tokens);
+        int token_count = tokenize(command, tokens);
         if (token_count <= 0)
             continue;
 
@@ -375,7 +371,7 @@ int main()
             {
                 if (stages[cmds_num].argc == 0 && stages[cmds_num].infile == NULL && stages[cmds_num].outfile == NULL)
                 {
-                    fprintf(stderr, "Syntax error near unexpected token '|'!\n");
+                    fputs("Syntax error near unexpected token '|'!\n", stderr);
                     syntax_error = true;
                     break;
                 }
@@ -387,7 +383,7 @@ int main()
             {
                 if (i + 1 >= token_count || tokens[i + 1].type != TOKEN_WORD)
                 {
-                    fprintf(stderr, "Syntax error near unexpected token '<'!\n");
+                    fputs("Syntax error near unexpected token '<'!\n", stderr);
                     syntax_error = true;
                     break;
                 }
@@ -399,7 +395,7 @@ int main()
             {
                 if (i + 1 >= token_count || tokens[i + 1].type != TOKEN_WORD)
                 {
-                    fprintf(stderr, "Syntax error near unexpected token '>'!\n");
+                    fputs("Syntax error near unexpected token '>'!\n", stderr);
                     syntax_error = true;
                     break;
                 }
@@ -431,7 +427,6 @@ int main()
                 int status = 0;
                 if (stages[0].argc > 1)
                     status = atoi(stages[0].argv[1]);
-
                 return status;
             }
 
@@ -439,13 +434,12 @@ int main()
             {
                 if (stages[0].argc < 2)
                 {
-                    fprintf(stderr, "cd: missing path argument\n");
+                    fprintf(stderr, "Missing path!\n\tcd <path>\n");
                     continue;
                 }
 
                 if (chdir(stages[0].argv[1]) != 0)
                     perror("cd");
-
                 continue;
             }
         }

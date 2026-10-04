@@ -17,7 +17,6 @@ int compare_entries(const void *a, const void *b)
     const Entry *eb = b;
     if (ea->is_directory != eb->is_directory)
         return eb->is_directory - ea->is_directory;
-
     return strcmp(ea->name, eb->name);
 }
 
@@ -52,18 +51,15 @@ int main(int argc, char *argv[])
         entries[count].is_directory = 0;
         if (stat(path, &info) == 0)
             entries[count].is_directory = S_ISDIR(info.st_mode);
-
         count++;
     }
 
     closedir(directory);
     qsort(entries, count, sizeof(Entry), compare_entries);
-
     for (int i = 0; i < count; i++)
         if (entries[i].is_directory)
             printf("%s/\n", entries[i].name);
         else
             printf("%s\n", entries[i].name);
-
     return 0;
 }

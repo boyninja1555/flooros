@@ -11,16 +11,21 @@ static int move_item(const char *source, const char *destination)
 {
     if (rename(source, destination) == 0)
         return 0;
-
     perror(source);
     return 1;
 }
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        fprintf(stderr, "Missing source!\n\t%s <source> <destination>\n", argv[0]);
+        return 1;
+    }
+
     if (argc < 3)
     {
-        fprintf(stderr, "Usage: %s <source...> <destination>\n", argv[0]);
+        fprintf(stderr, "Missing destination!\n\t%s %s <destination>\n", argv[0], argv[1]);
         return 1;
     }
 
@@ -46,7 +51,6 @@ int main(int argc, char *argv[])
         }
         else
             snprintf(destination, sizeof(destination), "%s", target);
-
         if (move_item(argv[i], destination) != 0)
             status = 1;
     }

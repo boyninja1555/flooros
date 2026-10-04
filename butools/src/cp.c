@@ -76,9 +76,15 @@ static int copy_file(const char *source, const char *destination)
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        fprintf(stderr, "Missing source!\n\t%s <source...> <destination>\n", argv[0]);
+        return 1;
+    }
+
     if (argc < 3)
     {
-        fprintf(stderr, "Usage: %s <source...> <destination>\n", argv[0]);
+        fprintf(stderr, "Missing destination!\n\t%s %s <destination>\n", argv[0], argv[1]);
         return 1;
     }
 

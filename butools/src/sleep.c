@@ -6,7 +6,7 @@ int main(int argc, const char *argv[])
 {
     if (argc != 2)
     {
-        fprintf(stderr, "Usage: %s <seconds>\n", argv[0]);
+        fprintf(stderr, "Missing seconds!\n\t%s <seconds>\n", argv[0]);
         return 1;
     }
 

@@ -41,7 +41,6 @@ static int attach_console()
     dup2(console, STDERR_FILENO);
     if (console > STDERR_FILENO)
         close(console);
-
     return 0;
 }
 
@@ -77,12 +76,11 @@ static void spawn_shell()
             printf("shellyfloor exited with status %d\n", WEXITSTATUS(status));
         else if (WIFSIGNALED(status))
             printf("shellyfloor killed by signal %d\n", WTERMSIG(status));
-
         printf("Restarting shellyfloor...\n");
     }
 }
 
-int main()
+int main(void)
 {
     setup_filesystem();
     sleep(1);

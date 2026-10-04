@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        fprintf(stderr, "Usage: %s [-r] <path...>\n", argv[0]);
+        fprintf(stderr, "Missing path(s)!\n\t%s [-r] <path...>\n", argv[0]);
         return 1;
     }
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         start_index = 2;
         if (argc < 3)
         {
-            fprintf(stderr, "Usage: %s [-r] <path...>\n", argv[0]);
+            fprintf(stderr, "Missing path(s)!\n\t%s -r <path...>\n", argv[0]);
             return 1;
         }
     }
