@@ -299,7 +299,16 @@ static int execute_pipeline(char *cwd, int cmds_num, CommandStage stages[])
             if (strcmp(stages[i].argv[0], "cd") == 0)
                 _exit(0);
 
-            execv(stages[i].argv[0], stages[i].argv);
+            // If I ever decide to unfortuantly add a PATH thingy, this will become "outdated"
+            char *exec = malloc(strlen(stages[i].argv[0]) + 6);
+            if (stages[i].argv[0][0] != '.' && stages[i].argv[0][0] != '/')
+            {
+                strcpy(exec + 5, stages[i].argv[0]);
+                memcpy(exec, "/bin/", 5);
+            }
+            else
+                strcpy(exec, stages[i].argv[0]);
+            execv(exec, stages[i].argv);
             perror("execv");
             _exit(1);
         }
@@ -439,21 +448,6 @@ int main()
 
                 continue;
             }
-        }
-
-        // If I ever decide to unfortuantly add a PATH thingy, this will become "outdated"
-        char *exec = stages[0].argv[0];
-        if (exec[0] != '.' && exec[0] != '/')
-        {
-            char original[strlen(exec) + 6];
-            memcpy(original, exec, strlen(exec) + 1);
-
-            // Original
-            memcpy(exec + 5, original, strlen(original));
-            exec[strlen(exec)] = '\0';
-
-            // Assumed prefix
-            memcpy(exec, "/bin/", 5);
         }
 
         execute_pipeline(cwd, cmds_num, stages);
