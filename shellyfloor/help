@@ -1,0 +1,3 @@
+Semi-modern replacement for sh/bash.
+
+This command is invoked at startup to provide shell access to FloorOS. Invoking it inside an existing shellyfloor session will create a nested shell.

@@ -1,0 +1,5 @@
+Displays the text-based documentation of a command. When no command is specified, lists the contents of /bin/ and whether each entry has corrosponding documentation.
+
+Documentation for commands must be placed inside /bin-h/ and named according to the command.
+
+For example, ls (/bin/ls) would have documentation located at /bin-h/ls

@@ -45,7 +45,7 @@ build/butools/%: butools/%.c
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
-	mkdir -p rootfs/bin rootfs/dev rootfs/proc rootfs/sys rootfs/lib
+	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib
 	ln -s lib rootfs/lib64
 
 # "Important" libraries
@@ -55,6 +55,8 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	cp $(SYS_BIN) rootfs/init
 	cp $(SHELL_BIN) rootfs/bin/sf
 	cp $(BUTOOLS_BIN) rootfs/bin/
+	cp butools/src-h/* rootfs/bin-h/
+	cp shellyfloor/help rootfs/bin-h/sf
 	@echo "Copying dynamic interpreter and shared libraries..."
 	@for bin in $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN); do \
 		for lib in $$(ldd $$bin 2>/dev/null | grep -o '/[^\ ]*'); do \
