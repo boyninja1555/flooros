@@ -1,4 +1,3 @@
-# Build files
 build/
 rootfs/
 *.img
@@ -7,7 +6,7 @@ iso/
 linux-*/
 linux-*.tar.xz
 
-# Env
+# Environment
 .vscode/
 .idea/
 *.iml
