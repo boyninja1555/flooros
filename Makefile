@@ -50,7 +50,7 @@ build/butools/%: butools/%.c
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
-	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib
+	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib rootfs/home
 	ln -s lib rootfs/lib64
 
 # "Important" libraries
@@ -67,8 +67,8 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	cp gooner/help rootfs/bin-h/gooner
 
 # Egg!
-	cp assemble-me-inside-flooros.asm rootfs/assemble-me.asm
-	cp gooner/note.gnr rootfs/note.gnr
+	cp misc/assemble-me-inside-flooros.asm rootfs/home/assemble-me.asm
+	cp misc/welcome.txt rootfs/home/
 
 # Compilablilityness
 	cp /bin/as rootfs/bin/
@@ -115,7 +115,7 @@ run-iso: FloorOS.iso
 	$(QEMU) -m 512M -cdrom FloorOS.iso -boot d
 
 clean:
-	rm -r rootfs iso build gooner/build FloorOS.iso initramfs.img
+	rm -rf rootfs iso build gooner/build FloorOS.iso initramfs.img
 	@echo "Kernel source was NOT deleted to save time! Delete $(KERNEL_DIR) manually if needed, but generally it'd a bad idea and booooooo."
 
 -include $(DEPS)

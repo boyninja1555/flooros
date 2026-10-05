@@ -1,0 +1,14 @@
+|=== A place to call home! ===|
+
+ This entire directory is safe
+ to delete, with no downsides!
+
+  While it may contain a silly
+ secret, it's a home directory.
+    You're not bound by the
+   filesystem structure here!
+
+  Decimate anything you want,
+    experiment, run 'help',
+   FloorOS doesn't fuck with
+             you!

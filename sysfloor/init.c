@@ -2,9 +2,9 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/reboot.h>
+#include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
@@ -46,6 +46,7 @@ static int attach_console()
 
 static void spawn_shell()
 {
+    chdir("/home");
     while (1)
     {
         pid_t pid = fork();
@@ -90,7 +91,7 @@ int main(void)
     if (attach_console() == 0)
         printf("\033[2J\033[H");
 
-    printf("\033[1;31mFloorOS x Shellyfloor (sf)\033[0m\n");
+    puts("\033[1;31mFloorOS x Shellyfloor (sf)\033[0m");
     spawn_shell();
     printf("System halted!\n");
     reboot(RB_POWER_OFF);
