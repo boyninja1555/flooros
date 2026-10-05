@@ -15,6 +15,7 @@ BUTOOLS_SRC := $(shell find butools -name "*.c" 2>/dev/null)
 SYS_BIN     := build/init
 SHELL_BIN   := build/sf
 BUTOOLS_BIN := $(patsubst butools/%.c, build/butools/%, $(BUTOOLS_SRC))
+GOONER_BIN  := gooner/build
 DEPS        := $(shell find build -name "*.d" 2>/dev/null)
 
 .PHONY: all clean run run-dev run-iso
@@ -38,11 +39,15 @@ $(SHELL_BIN): $(SHELL_SRC)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $^ -o $@
 
+$(GOONER_BIN):
+	cmake -S gooner -B $(GOONER_BIN)
+	cmake --build $(GOONER_BIN)
+
 build/butools/%: butools/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $< -o $@
 
-initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
+initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
 	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib
@@ -55,12 +60,15 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 # Subprojects
 	cp $(SYS_BIN) rootfs/init
 	cp $(SHELL_BIN) rootfs/bin/sf
+	cp shellyfloor/help rootfs/bin-h/sf
 	cp $(BUTOOLS_BIN) rootfs/bin/
 	cp butools/src-h/* rootfs/bin-h/
-	cp shellyfloor/help rootfs/bin-h/sf
+	cp $(GOONER_BIN)/gooner rootfs/bin/
+	cp gooner/help rootfs/bin-h/gooner
 
 # Egg!
 	cp assemble-me-inside-flooros.asm rootfs/assemble-me.asm
+	cp gooner/note.gnr rootfs/note.gnr
 
 # Compilablilityness
 	cp /bin/as rootfs/bin/
@@ -107,7 +115,7 @@ run-iso: FloorOS.iso
 	$(QEMU) -m 512M -cdrom FloorOS.iso -boot d
 
 clean:
-	rm -rf rootfs iso build FloorOS.iso initramfs.img
+	rm -r rootfs iso build gooner/build FloorOS.iso initramfs.img
 	@echo "Kernel source was NOT deleted to save time! Delete $(KERNEL_DIR) manually if needed, but generally it'd a bad idea and booooooo."
 
 -include $(DEPS)
