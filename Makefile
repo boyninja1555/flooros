@@ -97,12 +97,7 @@ FloorOS.iso: $(BZIMAGE) initramfs.img
 	mkdir -p iso/boot/grub
 	cp initramfs.img iso/boot/initramfs.img
 	cp $(BZIMAGE) iso/boot/vmlinuz
-	echo 'set timeout=0' > iso/boot/grub/grub.cfg
-	echo 'set default=0' >> iso/boot/grub/grub.cfg
-	echo 'menuentry "FloorOS" {' >> iso/boot/grub/grub.cfg
-	echo '    linux /boot/vmlinuz console=tty0' >> iso/boot/grub/grub.cfg
-	echo '    initrd /boot/initramfs.img' >> iso/boot/grub/grub.cfg
-	echo '}' >> iso/boot/grub/grub.cfg
+	cp grub.cfg iso/boot/grub/grub.cfg
 	grub-mkrescue -o FloorOS.iso iso
 
 run: $(BZIMAGE) initramfs.img
