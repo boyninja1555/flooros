@@ -101,7 +101,7 @@ FloorOS.iso: $(BZIMAGE) initramfs.img
 	grub-mkrescue -o FloorOS.iso iso
 
 run: $(BZIMAGE) initramfs.img
-	$(QEMU) -m 512M -kernel $(BZIMAGE) -initrd initramfs.img -append "console=tty0"
+	$(QEMU) -m 512M -vga std -kernel $(BZIMAGE) -initrd initramfs.img -append "console=tty0"
 
 run-dev: $(BZIMAGE) initramfs.img
 	$(QEMU) -m 512M -kernel $(BZIMAGE) -initrd initramfs.img -append "console=ttyS0" -nographic
