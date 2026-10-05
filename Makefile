@@ -50,7 +50,7 @@ build/butools/%: butools/%.c
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
-	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib rootfs/home
+	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib rootfs/etc rootfs/home
 	ln -s lib rootfs/lib64
 
 # "Important" libraries
@@ -65,6 +65,7 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	cp butools/src-h/* rootfs/bin-h/
 	cp $(GOONER_BIN)/gooner rootfs/bin/
 	cp gooner/help rootfs/bin-h/gooner
+	cp misc/logo.ppm rootfs/etc/
 
 # Egg!
 	cp misc/assemble-me-inside-flooros.asm rootfs/home/assemble-me.asm

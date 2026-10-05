@@ -8,6 +8,8 @@
 #define GNR_MAGIC "\0GNR"
 #define GNR_MAGIC_LENGTH 4
 
+int main_gnr(int argc, const char *argv[]);
+
 typedef struct
 {
     uint8_t major, minor, patch;
