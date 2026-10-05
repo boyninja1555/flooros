@@ -1,5 +1,6 @@
 #include <linux/limits.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +8,7 @@
 
 typedef struct
 {
-    char name[PATH_MAX];
+    char name[NAME_MAX + 1];
     int is_directory;
 } Entry;
 
@@ -22,10 +23,11 @@ int compare_entries(const void *a, const void *b)
 
 int main(int argc, char *argv[])
 {
-    char *dirpath = ".";
+    char dirpath[PATH_MAX];
     if (argc > 1)
-        dirpath = argv[1];
-
+        strcpy(dirpath, argv[1]);
+    else
+        getcwd(dirpath, PATH_MAX);
     DIR *directory = opendir(dirpath);
     if (!directory)
     {
@@ -42,10 +44,10 @@ int main(int argc, char *argv[])
             strcmp(entry->d_name, "..") == 0)
             continue;
 
-        snprintf(entries[count].name, sizeof(entries[count].name), "%s", entry->d_name);
+        strcpy(entries[count].name, entry->d_name);
 
         char path[PATH_MAX];
-        snprintf(path, sizeof(path), "%s/%s", argv[1], entry->d_name);
+        snprintf(path, sizeof(path), "%s/%s", dirpath, entry->d_name);
 
         struct stat info;
         entries[count].is_directory = 0;
