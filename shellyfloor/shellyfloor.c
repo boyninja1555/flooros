@@ -208,6 +208,8 @@ static int tokenize(char *command, Token tokens[])
             continue;
         }
 
+        if (c == '#')
+            return 0;
         reading = true;
         if (temp_length < MAX_TOKEN_LENGTH - 1)
             temp[temp_length++] = c;

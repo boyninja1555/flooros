@@ -52,11 +52,14 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	cp /lib/x86_64-linux-gnu/libnss_files.so.2 rootfs/lib/
 	cp /lib/x86_64-linux-gnu/libnss_dns.so.2 rootfs/lib/
 
+# Subprojects
 	cp $(SYS_BIN) rootfs/init
 	cp $(SHELL_BIN) rootfs/bin/sf
 	cp $(BUTOOLS_BIN) rootfs/bin/
 	cp butools/src-h/* rootfs/bin-h/
 	cp shellyfloor/help rootfs/bin-h/sf
+
+# Egg!
 	cp assemble-me-inside-flooros.asm rootfs/assemble-me.asm
 
 # Compilablilityness
