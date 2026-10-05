@@ -62,6 +62,7 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 # Compilablilityness
 	cp /bin/as rootfs/bin/
 	cp /bin/ld rootfs/bin/
+	cp /bin/nasm rootfs/bin/
 	cp /lib/x86_64-linux-gnu/libbfd-*-system.so rootfs/lib/
 	cp /lib/x86_64-linux-gnu/libz.so.* rootfs/lib/
 	cp /lib/x86_64-linux-gnu/libzstd.so.* rootfs/lib/
