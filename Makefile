@@ -57,6 +57,18 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 	cp $(BUTOOLS_BIN) rootfs/bin/
 	cp butools/src-h/* rootfs/bin-h/
 	cp shellyfloor/help rootfs/bin-h/sf
+	cp assemble-me-inside-flooros.asm rootfs/assemble-me.asm
+
+# Compilablilityness
+	cp /bin/as rootfs/bin/
+	cp /bin/ld rootfs/bin/
+	cp /lib/x86_64-linux-gnu/libbfd-*-system.so rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libz.so.* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libzstd.so.* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libsframe.so.* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libctf.so.* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libjansson.so.* rootfs/lib/
+
 	@echo "Copying dynamic interpreter and shared libraries..."
 	@for bin in $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN); do \
 		for lib in $$(ldd $$bin 2>/dev/null | grep -o '/[^\ ]*'); do \
@@ -65,6 +77,7 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN)
 			fi; \
 		done; \
 	done
+
 	cd rootfs && find . -print0 | cpio --null -ov --format=newc > ../initramfs.img
 
 FloorOS.iso: $(BZIMAGE) initramfs.img
