@@ -22,10 +22,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-efi-amd64-bin grub-common mtools flex bison bc libssl-dev libelf-dev wget
-
-      - name: NASM is my favorite! Who knows when you want to write Assembly in FloorOS?
-        uses: ilammy/setup-nasm@v1.5.2
+          sudo apt-get install -y build-essential gcc make cpio xorriso grub-pc-bin grub-efi-amd64-bin grub-common mtools flex bison bc libssl-dev libelf-dev wget nasm
 
       - name: Build the entirety of FloorOS
         run: |
