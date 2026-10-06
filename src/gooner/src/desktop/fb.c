@@ -84,13 +84,24 @@ void framebuf_pxtext(uint32_t x, uint32_t y, uint32_t color, const char *text)
 void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
 {
     uint8_t glyph[FONTC_HEIGHT] = {0};
-
-    "FLORSGNEDKTP";
-
     switch (c)
     {
+    case ' ':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                      },
+               FONTC_HEIGHT);
+        break;
     case 'A':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00011000,
                           0b00111100,
                           0b00100100,
                           0b01100110,
@@ -98,97 +109,45 @@ void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
                           0b01111110,
                           0b01000010,
                           0b01000010,
-                          0b01000010,
                       },
                FONTC_HEIGHT);
         break;
-    case 'F':
+    case 'B':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111110,
-                          0b01000000,
-                          0b01000000,
-                          0b01111110,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
+                          0b01111100,
+                          0b01000010,
+                          0b01000010,
+                          0b01111100,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01111100,
                       },
                FONTC_HEIGHT);
         break;
-    case 'L':
+    case 'C':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01111110,
-                      },
-               FONTC_HEIGHT);
-    case 'O':
-        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111110,
+                          0b00111100,
+                          0b01100110,
                           0b01000010,
+                          0b01000000,
+                          0b01000000,
                           0b01000010,
-                          0b01000010,
-                          0b01000010,
-                          0b01000010,
-                          0b01000010,
-                          0b01111110,
+                          0b01100110,
+                          0b00111100,
                       },
                FONTC_HEIGHT);
         break;
-    case 'R':
+    case 'D':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111110,
-                          0b01000010,
-                          0b01000010,
-                          0b01111110,
-                          0b01110000,
-                          0b01011000,
+                          0b01111000,
                           0b01001100,
                           0b01000110,
-                      },
-               FONTC_HEIGHT);
-        break;
-    case 'S':
-        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111110,
-                          0b01000010,
-                          0b01000000,
-                          0b01111110,
-                          0b00000010,
-                          0b00000010,
-                          0b01000010,
-                          0b01111110,
-                      },
-               FONTC_HEIGHT);
-        break;
-    case 'G':
-        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111110,
-                          0b01000000,
-                          0b01000000,
-                          0b01001110,
                           0b01000010,
                           0b01000010,
-                          0b01000010,
-                          0b01111110,
-                      },
-               FONTC_HEIGHT);
-        break;
-    case 'N':
-        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01100010,
-                          0b01110010,
-                          0b01010010,
-                          0b01011010,
-                          0b01001010,
-                          0b01001010,
-                          0b01001110,
                           0b01000110,
+                          0b01001100,
+                          0b01111000,
                       },
                FONTC_HEIGHT);
         break;
@@ -205,16 +164,68 @@ void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
                       },
                FONTC_HEIGHT);
         break;
-    case 'D':
+    case 'F':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
-                          0b01111000,
-                          0b01000100,
+                          0b01111110,
+                          0b01000000,
+                          0b01000000,
+                          0b01111110,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'G':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00111100,
+                          0b01100110,
+                          0b01000000,
+                          0b01001110,
+                          0b01000010,
+                          0b01000010,
+                          0b01100110,
+                          0b00111100,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'H':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01111110,
                           0b01000010,
                           0b01000010,
                           0b01000010,
                           0b01000010,
-                          0b01000100,
-                          0b01111000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'I':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01111110,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b01111110,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'J':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01111110,
+                          0b00000100,
+                          0b00000100,
+                          0b00000100,
+                          0b00000100,
+                          0b00000100,
+                          0b01101100,
+                          0b00111000,
                       },
                FONTC_HEIGHT);
         break;
@@ -224,10 +235,114 @@ void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
                           0b01001100,
                           0b01011000,
                           0b01110000,
-                          0b01110000,
                           0b01011000,
                           0b01001100,
                           0b01000110,
+                          0b01000110,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'L':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                          0b01111110,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'M':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01101100,
+                          0b01111100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'N':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01100010,
+                          0b01110010,
+                          0b01010010,
+                          0b01011010,
+                          0b01001010,
+                          0b01001010,
+                          0b01001110,
+                          0b01000110,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'O':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00111100,
+                          0b01100110,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01100110,
+                          0b00111100,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'P':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01111100,
+                          0b01000110,
+                          0b01000010,
+                          0b01000110,
+                          0b01111100,
+                          0b01000000,
+                          0b01000000,
+                          0b01000000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'Q':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00111100,
+                          0b01100110,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01100010,
+                          0b00111110,
+                          0b00000010,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'R':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01111100,
+                          0b01000110,
+                          0b01000010,
+                          0b01000110,
+                          0b01111100,
+                          0b01110000,
+                          0b01011100,
+                          0b01000110,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'S':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00111100,
+                          0b01100110,
+                          0b01000000,
+                          0b00111100,
+                          0b00000110,
+                          0b00000010,
+                          0b01100110,
+                          0b00111100,
                       },
                FONTC_HEIGHT);
         break;
@@ -244,16 +359,159 @@ void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
                       },
                FONTC_HEIGHT);
         break;
-    case 'P':
+    case 'U':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b01100110,
+                          0b00111100,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'V':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000010,
+                          0b01000010,
+                          0b01000010,
+                          0b00100100,
+                          0b00100100,
+                          0b00100100,
+                          0b00011000,
+                          0b00011000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'W':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01010100,
+                          0b01101100,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'X':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000010,
+                          0b01000010,
+                          0b00100100,
+                          0b00011000,
+                          0b00011000,
+                          0b00100100,
+                          0b01000010,
+                          0b01000010,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'Y':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b01000100,
+                          0b01000100,
+                          0b00101000,
+                          0b00101000,
+                          0b00101000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case 'Z':
         memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
                           0b01111110,
-                          0b01000010,
-                          0b01000010,
+                          0b00000010,
+                          0b00000110,
+                          0b00001100,
+                          0b00110000,
+                          0b01100000,
+                          0b01000000,
                           0b01111110,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
-                          0b01000000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case ',':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00001000,
+                          0b00001000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case '.':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00010000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case '!':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00010000,
+                          0b00000000,
+                          0b00010000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case '?':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00111100,
+                          0b01100110,
+                          0b00000110,
+                          0b00001100,
+                          0b00011000,
+                          0b00000000,
+                          0b00010000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    case ';':
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b00001000,
+                          0b00001000,
+                          0b00000000,
+                          0b00000000,
+                          0b00000000,
+                          0b00001000,
+                          0b00001000,
+                          0b00010000,
+                      },
+               FONTC_HEIGHT);
+        break;
+    default:
+        memcpy(glyph, (uint8_t[FONTC_HEIGHT]){
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
+                          0b11111111,
                       },
                FONTC_HEIGHT);
         break;

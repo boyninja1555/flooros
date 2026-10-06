@@ -11,6 +11,7 @@
 #define LOGO_PADDING 8
 #define TEXT_TOP "FLOOROS"
 #define TEXT_BOT "GOONER DESKTOP"
+#define TEXT_ALPHA "ABCDEFGHIJKLMNOPQRSTUVWXYZ,.!?;"
 
 static bool running = true;
 
@@ -25,8 +26,9 @@ void desktop_render(void)
     framebuf_pxclear(framebuf_px(0xFF, 0, 0x7F, 0xFF));
 
     // Text
-    framebuf_pxtext(text_top_x, text_top_y, framebuf_px(0xFF, 0x40, 0x40, 0x40), TEXT_TOP);
-    framebuf_pxtext(text_bot_x, text_bot_y, framebuf_px(0xFF, 0x20, 0x20, 0x20), TEXT_BOT);
+    framebuf_pxtext(8, 8, framebuf_px(0x7F, 0, 0, 0), TEXT_ALPHA);
+    framebuf_pxtext(text_top_x, text_top_y, framebuf_px(0xFF, 0x20, 0x20, 0x20), TEXT_TOP);
+    framebuf_pxtext(text_bot_x, text_bot_y, framebuf_px(0xFF, 0x40, 0x40, 0x40), TEXT_BOT);
 
     // Logo
     framebuf_pxfill(logo_x - LOGO_PADDING, logo_y - LOGO_PADDING, logo_width + (LOGO_PADDING * 2), logo_height + (LOGO_PADDING * 2), framebuf_px(0xFF, 0x7F, 0x7F, 0x7F));
