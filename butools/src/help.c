@@ -19,7 +19,7 @@ int document(const char *command)
         memcpy(helpfile, "/bin-h/", 7);
         strcpy(helpfile + 7, command);
 
-        char *args[] = {"/bin/cat", helpfile};
+        char *args[] = {"/bin/kitty", helpfile};
         execv(args[0], args);
     }
 

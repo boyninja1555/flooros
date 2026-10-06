@@ -91,7 +91,6 @@ int main(void)
     if (attach_console() == 0)
         printf("\033[2J\033[H");
 
-    puts("\033[1;31mFloorOS x Shellyfloor (sf)\033[0m");
     spawn_shell();
     printf("System halted!\n");
     reboot(RB_POWER_OFF);

@@ -334,6 +334,7 @@ static int execute_pipeline(char *cwd, int cmds_num, CommandStage stages[])
 
 int main(void)
 {
+    puts("\033[1;31mFloorOS (sf)\033[0m");
     char cwd[PATH_MAX];
     char hostname[64];
     while (1)
@@ -342,7 +343,7 @@ int main(void)
         cwd[sizeof(cwd) - 1] = '\0';
 
         gethostname(hostname, sizeof(hostname));
-        printf("\x1b[1;32msf@%s\x1b[0m:\x1b[1;34m%s\x1b[0m$ ", hostname, cwd);
+        printf("\x1b[1;34m%s\x1b[1;32m$\x1b[0m ", cwd);
         fflush(stdout);
 
         char command[MAX_COMMAND_LENGTH];
