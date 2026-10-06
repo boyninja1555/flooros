@@ -1,11 +1,11 @@
 #define _GNU_SOURCE
-#include "gnr.h"
+#include "gnr/gnr.h"
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gnrmake.h"
+#include "gnr/gnrmake.h"
 
 int main_gnr(int argc, const char *argv[])
 {
@@ -14,7 +14,7 @@ int main_gnr(int argc, const char *argv[])
     {
         if (argc != 3)
         {
-            printf("Missing config!\n\t%s -make <config.xml>\n", argv[0]);
+            printf("Missing config!\n\t%s -make <gnr.cfg>\n", argv[0]);
             return 1;
         }
 

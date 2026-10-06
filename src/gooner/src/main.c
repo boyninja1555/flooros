@@ -1,4 +1,4 @@
-#include "gnr.h"
+#include "gnr/gnr.h"
 #include "desktop/main.h"
 
 int main(int argc, const char *argv[])
