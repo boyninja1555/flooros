@@ -77,7 +77,7 @@ static void spawn_shell()
             printf("shellyfloor exited with status %d\n", WEXITSTATUS(status));
         else if (WIFSIGNALED(status))
             printf("shellyfloor killed by signal %d\n", WTERMSIG(status));
-        printf("Restarting shellyfloor...\n");
+        puts("Restarting shellyfloor...");
     }
 }
 
@@ -89,10 +89,13 @@ int main(void)
     const char *hostname = "FloorOS";
     sethostname(hostname, strlen(hostname));
     if (attach_console() == 0)
-        printf("\033[2J\033[H");
+    {
+        fputs("\033[2J\033[H", stdout);
+        fflush(stdout);
+    }
 
     spawn_shell();
-    printf("System halted!\n");
+    puts("System halted!");
     reboot(RB_POWER_OFF);
     return 0;
 }

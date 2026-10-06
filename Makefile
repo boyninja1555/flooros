@@ -8,14 +8,14 @@ KERNEL_DIR  := linux-$(KERNEL_VER)
 KERNEL_TAR  := $(KERNEL_DIR).tar.xz
 BZIMAGE     := $(KERNEL_DIR)/arch/x86_64/boot/bzImage
 
-SYS_SRC     := $(shell find sysfloor -name "*.c" 2>/dev/null)
-SHELL_SRC   := $(shell find shellyfloor -name "*.c" 2>/dev/null)
-BUTOOLS_SRC := $(shell find butools -name "*.c" 2>/dev/null)
+SYS_SRC     := src/sysfloor.c
+SHELL_SRC   := src/shellyfloor.c
+BUTOOLS_SRC := $(shell find src/butools/src -name "*.c" 2>/dev/null)
 
 SYS_BIN     := build/init
 SHELL_BIN   := build/sf
-BUTOOLS_BIN := $(patsubst butools/%.c, build/butools/%, $(BUTOOLS_SRC))
-GOONER_BIN  := gooner/build
+BUTOOLS_BIN := $(patsubst src/butools/%.c, build/butools/%, $(BUTOOLS_SRC))
+GOONER_BIN  := src/gooner/build
 DEPS        := $(shell find build -name "*.d" 2>/dev/null)
 
 .PHONY: all clean run run-dev run-iso
@@ -40,10 +40,10 @@ $(SHELL_BIN): $(SHELL_SRC)
 	$(CC) $(CFLAGS) $^ -o $@
 
 $(GOONER_BIN):
-	cmake -S gooner -B $(GOONER_BIN)
+	cmake -S src/gooner -B $(GOONER_BIN)
 	cmake --build $(GOONER_BIN)
 
-build/butools/%: butools/%.c
+build/butools/%: src/butools/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -60,11 +60,11 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 # Subprojects
 	cp $(SYS_BIN) rootfs/init
 	cp $(SHELL_BIN) rootfs/bin/sf
-	cp shellyfloor/help rootfs/bin-h/sf
+	cp src/shellyfloor-help rootfs/bin-h/sf
 	cp $(BUTOOLS_BIN) rootfs/bin/
-	cp butools/src-h/* rootfs/bin-h/
+	cp src/butools/src-h/* rootfs/bin-h/
 	cp $(GOONER_BIN)/gooner rootfs/bin/
-	cp gooner/help rootfs/bin-h/gooner
+	cp src/gooner/help rootfs/bin-h/gooner
 	cp misc/logo.ppm rootfs/etc/
 
 # Egg!
@@ -111,7 +111,7 @@ run-iso: FloorOS.iso
 	$(QEMU) -m 512M -cdrom FloorOS.iso -boot d
 
 clean:
-	rm -rf rootfs iso build gooner/build FloorOS.iso initramfs.img
+	rm -rf rootfs iso build src/gooner/build FloorOS.iso initramfs.img
 	@echo "Kernel source was NOT deleted to save time! Delete $(KERNEL_DIR) manually if needed, but generally it'd a bad idea and booooooo."
 
 -include $(DEPS)
