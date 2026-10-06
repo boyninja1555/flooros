@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define FONTC_WIDTH 8
-#define FONTC_HEIGHT 16
+#define FONTC_HEIGHT 8
 
 typedef struct
 {

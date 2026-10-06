@@ -9,8 +9,8 @@
 #include "desktop/image.h"
 
 #define LOGO_PADDING 8
-#define TEXT_TOP "FloorOS"
-#define TEXT_BOT "Gooner Desktop"
+#define TEXT_TOP "FLOOROS"
+#define TEXT_BOT "GOONER DESKTOP"
 
 static bool running = true;
 
@@ -55,8 +55,8 @@ int main_desktop(int argc, const char *argv[])
     text_bot_width = FONTC_WIDTH * strlen(TEXT_BOT);
     text_top_x = fb_w / 2 - text_top_width / 2;
     text_bot_x = fb_w / 2 - text_bot_width / 2;
-    text_top_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT;
-    text_bot_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT * 2;
+    text_top_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT * 2;
+    text_bot_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT * 4;
 
     desktop_render();
 
