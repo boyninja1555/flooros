@@ -65,11 +65,9 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	cp src/butools/src-h/* rootfs/bin-h/
 	cp $(GOONER_BIN)/gooner rootfs/bin/
 	cp src/gooner/help rootfs/bin-h/gooner
-	cp misc/logo.ppm rootfs/etc/
 
-# Egg!
-	cp misc/assemble-me-inside-flooros.asm rootfs/home/assemble-me.asm
-	cp misc/welcome.txt rootfs/home/
+# RootFS source
+	cp -r rootfs-src/* rootfs/
 
 # Compilablilityness
 	cp /bin/as rootfs/bin/

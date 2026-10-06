@@ -7,6 +7,7 @@
 
 #define GNR_MAGIC "\0GNR"
 #define GNR_MAGIC_LENGTH 4
+#define GNR_VERSION 1
 
 int main_gnr(int argc, const char *argv[]);
 

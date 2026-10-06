@@ -5,13 +5,26 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include "gnrmake.h"
 
 int main_gnr(int argc, const char *argv[])
 {
+    bool is_make = strcmp(argv[1], "-make") == 0 || strcmp(argv[1], "-m") == 0;
+    if (is_make)
+    {
+        if (argc != 3)
+        {
+            printf("Missing config!\n\t%s -make <config.xml>\n", argv[0]);
+            return 1;
+        }
+
+        return gnr_make(argv[2]);
+    }
+
     bool is_tell = strcmp(argv[1], "-tell") == 0 || strcmp(argv[1], "-t") == 0;
     if (is_tell && argc != 3)
     {
-        printf("Missing executable! \n\t%s -tell <executable.gnr>\n", argv[0]);
+        printf("Missing executable!\n\t%s -tell <executable.gnr>\n", argv[0]);
         return 1;
     }
 
@@ -97,6 +110,21 @@ bool gnr_validate(FILE *file)
     if (memcmp(GNR_MAGIC, magic, GNR_MAGIC_LENGTH) != 0)
     {
         fputs("File is not a valid executable! Check for obvious corruption and/or typos.\n", stderr);
+        return false;
+    }
+
+    uint16_t gnr_version;
+    fread(&gnr_version, 1, sizeof(uint16_t), file);
+
+    if (gnr_version > GNR_VERSION)
+    {
+        fprintf(stderr, "Executable built for a newer version of gooner's GNR feature! (fv%u)\n\tYour installation only supports fv%u.\n", gnr_version, GNR_VERSION);
+        return false;
+    }
+
+    if (gnr_version < GNR_VERSION)
+    {
+        fprintf(stderr, "Executable built for an older version of gooner's GNR feature! (fv%u)\n\tYour installation only supports fv%u.\n", gnr_version, GNR_VERSION);
         return false;
     }
 

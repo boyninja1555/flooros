@@ -1,3 +1,29 @@
-Provides the ability to launch '*.gnr' executables.
+Provides the ability to launch and create '*.gnr' executables.
 
-Soon to provide a simple desktop environment when invoked with no args.
+Provides a simple desktop environment when invoked with no args.
+
+Usages:
+	gooner                                 # simple desktop environment
+	gooner <executable.gnr>                # executes a *.gnr
+	gooner -tell <executable.gnr>          # dumps details of a *.gnr
+	gooner -make <config.xml>              # makes a *.gnr from an XML-based config
+
+A GNR make config is written in XML, structured like this:
+
+<gnr>
+	<name>Program</name>
+	<author>James FARTerson</author>
+	<version>1.3.2</version>
+	<elf>program.elf</elf>
+</gnr>
+
+Some notes on required tags:
+	<gnr> is required as it's the root tag.
+	<name> may be omitted completely and will appear empty.
+	<author> may be omitted completely and will appear empty.
+	<version> must follow SemVer formatting, though each digit ranges from 0-255 and will appear as 0.0.0 when omitted.
+	<elf> is required and must point to a valid ELF executable relative to the XML config.
+
+A non-standard XML implementation is used here, so comments will not work and attributes will cause tokenization errors.
+
+Deriviation from these requirements will be caught prior to *.gnr creation and may error.
