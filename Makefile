@@ -1,22 +1,23 @@
-CC          := gcc
-CFLAGS      := -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE -MMD
-QEMU        := qemu-system-x86_64
+CC             := gcc
+CFLAGS         := -O2 -Wall -Wextra -std=c17 -D_DEFAULT_SOURCE -MMD
+QEMU           := qemu-system-x86_64
 
-KERNEL_MAJ  := 7
-KERNEL_VER  := 7.1.7
-KERNEL_DIR  := linux-$(KERNEL_VER)
-KERNEL_TAR  := $(KERNEL_DIR).tar.xz
-BZIMAGE     := $(KERNEL_DIR)/arch/x86_64/boot/bzImage
+KERNEL_MAJ     := 7
+KERNEL_VER     := 7.1.7
+KERNEL_DIR     := linux-$(KERNEL_VER)
+KERNEL_TAR     := $(KERNEL_DIR).tar.xz
+BZIMAGE        := $(KERNEL_DIR)/arch/x86_64/boot/bzImage
 
-SYS_SRC     := src/sysfloor.c
-SHELL_SRC   := src/shellyfloor.c
-BUTOOLS_SRC := $(shell find src/butools/src -name "*.c" 2>/dev/null)
+SYS_SRC        := src/sysfloor.c
+SHELL_SRC      := src/shellyfloor.c
+BUTOOLS_SRC    := $(shell find src/butools/src -name "*.c" 2>/dev/null)
 
-SYS_BIN     := build/init
-SHELL_BIN   := build/sf
-BUTOOLS_BIN := $(patsubst src/butools/%.c, build/butools/%, $(BUTOOLS_SRC))
-GOONER_BIN  := src/gooner/build
-DEPS        := $(shell find build -name "*.d" 2>/dev/null)
+SYS_BIN        := build/init
+SHELL_BIN      := build/sf
+BUTOOLS_BIN    := $(patsubst src/butools/%.c, build/butools/%, $(BUTOOLS_SRC))
+GOONER_BIN     := src/gooner/build
+#LIBFLOOR69_BIN := src/libfloor69/build
+DEPS           := $(shell find build -name "*.d" 2>/dev/null)
 
 .PHONY: all clean run run-dev run-iso
 all: FloorOS.iso
@@ -43,14 +44,19 @@ $(GOONER_BIN):
 	cmake -S src/gooner -B $(GOONER_BIN)
 	cmake --build $(GOONER_BIN)
 
+#$(LIBFLOOR69_BIN):
+#	cmake -S src/libfloor69 -B $(LIBFLOOR69_BIN)
+#	cmake --build $(LIBFLOOR69_BIN)
+
 build/butools/%: src/butools/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $< -o $@
 
+#initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN) $(LIBFLOOR69_BIN)
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
-	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib rootfs/etc rootfs/home
+	mkdir -p rootfs/bin rootfs/bin-h rootfs/dev rootfs/proc rootfs/sys rootfs/lib rootfs/lib/include rootfs/etc rootfs/home
 	ln -s lib rootfs/lib64
 
 # "Important" libraries
@@ -65,6 +71,8 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	cp src/butools/src-h/* rootfs/bin-h/
 	cp $(GOONER_BIN)/gooner rootfs/bin/
 	cp src/gooner/help rootfs/bin-h/gooner
+#	cp $(LIBFLOOR69_BIN)/libfloor69.a rootfs/lib/
+#	cp src/libfloor69/include/libfloor69.h rootfs/lib/include/
 
 # RootFS source
 	cp -r rootfs-src/* rootfs/
@@ -109,7 +117,7 @@ run-iso: FloorOS.iso
 	$(QEMU) -m 512M -cdrom FloorOS.iso -boot d
 
 clean:
-	rm -rf rootfs iso build src/gooner/build FloorOS.iso initramfs.img
+	rm -rf rootfs iso build src/gooner/build src/libfloor69/build FloorOS.iso initramfs.img
 	@echo "Kernel source was NOT deleted to save time! Delete $(KERNEL_DIR) manually if needed, but generally it'd a bad idea and booooooo."
 
 -include $(DEPS)
