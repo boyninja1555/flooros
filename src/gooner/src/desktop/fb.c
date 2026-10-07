@@ -314,9 +314,9 @@ void framebuf_pxchar(uint32_t x, uint32_t y, uint32_t color, char c)
                           0b01000010,
                           0b01000010,
                           0b01000010,
-                          0b01100010,
-                          0b00111110,
-                          0b00000010,
+                          0b01100110,
+                          0b00111111,
+                          0b00000011,
                       },
                FONTC_HEIGHT);
         break;

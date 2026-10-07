@@ -1,23 +1,29 @@
 #define _POSIX_C_SOURCE 200112L
 #include <sys/signal.h>
+#include <linux/input.h>
 #include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
 #include "desktop/main.h"
 #include "desktop/fb.h"
+#include "desktop/kb.h"
 #include "desktop/image.h"
 
 #define LOGO_PADDING 8
 #define TEXT_TOP "FLOOROS"
 #define TEXT_BOT "GOONER DESKTOP"
 #define TEXT_ALPHA "ABCDEFGHIJKLMNOPQRSTUVWXYZ,.!?;"
+#define TEXT_EXIT "PRESS Q TO EXIT"
 
 static bool running = true;
 
 static uint8_t *logo = NULL;
 static uint32_t logo_x = 0, logo_y = 0, logo_width = 0, logo_height = 0;
 
+static uint32_t text_exit_x = 0, text_exit_y = 0, text_exit_width = 0;
 static uint32_t text_top_x = 0, text_top_y = 0, text_top_width = 0;
 static uint32_t text_bot_x = 0, text_bot_y = 0, text_bot_width = 0;
 
@@ -27,6 +33,7 @@ void desktop_render(void)
 
     // Text
     framebuf_pxtext(8, 8, framebuf_px(0x7F, 0, 0, 0), TEXT_ALPHA);
+    framebuf_pxtext(text_exit_x, text_exit_y, framebuf_px(0x7F, 0, 0, 0), TEXT_EXIT);
     framebuf_pxtext(text_top_x, text_top_y, framebuf_px(0xFF, 0x20, 0x20, 0x20), TEXT_TOP);
     framebuf_pxtext(text_bot_x, text_bot_y, framebuf_px(0xFF, 0x40, 0x40, 0x40), TEXT_BOT);
 
@@ -53,19 +60,32 @@ int main_desktop(int argc, const char *argv[])
     logo_x = fb_w / 2 - logo_width / 2;
     logo_y = fb_h / 2 - logo_height / 2 - logo_height;
 
+    text_exit_width = FONTC_WIDTH * strlen(TEXT_EXIT);
     text_top_width = FONTC_WIDTH * strlen(TEXT_TOP);
     text_bot_width = FONTC_WIDTH * strlen(TEXT_BOT);
+    text_exit_x = fb_w - text_exit_width - 8;
     text_top_x = fb_w / 2 - text_top_width / 2;
     text_bot_x = fb_w / 2 - text_bot_width / 2;
+    text_exit_y = 8;
     text_top_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT * 2;
     text_bot_y = fb_h / 2 - logo_height / 2 + FONTC_HEIGHT * 4;
 
     desktop_render();
 
+    char input_path[DEVICE_PATH_MAX] = {0};
+    fd_get_keyboard(input_path);
+
+    int input_fd = open(input_path, O_RDONLY | O_NONBLOCK);
+    struct input_event event;
     struct timespec next;
     clock_gettime(CLOCK_MONOTONIC, &next);
     while (running)
     {
+        ssize_t n = read(input_fd, &event, sizeof(event));
+        if (n == (ssize_t)sizeof(event))
+            if (event.type == EV_KEY && event.value == 1 && event.code == KEY_Q)
+                running = false;
+
         // desktop_render();
 
         next.tv_nsec += 16666667;
@@ -78,6 +98,7 @@ int main_desktop(int argc, const char *argv[])
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next, NULL);
     }
 
+    close(input_fd);
     framebuf_close();
     return 0;
 }
