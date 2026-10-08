@@ -17,15 +17,26 @@ int main()
     buf.init();
 
     int fd_console = open("/dev/console", O_RDWR);
-    char devicepath_input[DEVICE_PATH_MAX];
-    Keyboard::get(devicepath_input);
 
-    int fd_input = open(devicepath_input, O_RDONLY | O_NONBLOCK);
-    if (!fd_input)
+    char devicepath_keyboard[DEVICE_PATH_MAX];
+    char devicepath_mouse[DEVICE_PATH_MAX];
+    Keyboard::get(devicepath_keyboard);
+    Mouse::get(devicepath_mouse);
+
+    int fd_keyboard = open(devicepath_keyboard, O_RDONLY | O_NONBLOCK);
+    if (!fd_keyboard)
     {
-        ioctl(fd_console, KDSETMODE, KD_TEXT);
         close(fd_console);
         std::cerr << "Unable to launch gooner! No keyboard device was found." << std::endl;
+        return 1;
+    }
+
+    int fd_mouse = open(devicepath_mouse, O_RDONLY | O_NONBLOCK);
+    if (!fd_mouse)
+    {
+        close(fd_console);
+        close(fd_keyboard);
+        std::cerr << "Unable to launch gooner! No mouse device was found." << std::endl;
         return 1;
     }
 
@@ -33,6 +44,8 @@ int main()
     if (!Cycle::init(elements, buf))
     {
         close(fd_console);
+        close(fd_keyboard);
+        close(fd_mouse);
         return 1;
     }
 
@@ -40,12 +53,14 @@ int main()
     struct input_event iev;
     while (Cycle::running)
     {
-        Cycle::update(elements, &iev, fd_input);
+        Cycle::update(elements, buf, &iev, fd_keyboard, fd_mouse);
         Cycle::render(elements, buf);
     }
 
     Cycle::cleanup();
     ioctl(fd_console, KDSETMODE, KD_TEXT);
     close(fd_console);
+    close(fd_keyboard);
+    close(fd_mouse);
     return 0;
 }

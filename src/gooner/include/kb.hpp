@@ -9,3 +9,10 @@ namespace Keyboard
 
     bool get(char devicepath_ptr[DEVICE_PATH_MAX]);
 };
+
+namespace Mouse
+{
+    bool is(int fd);
+
+    bool get(char devicepath_ptr[DEVICE_PATH_MAX]);
+};
