@@ -6,5 +6,5 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Executable
 add_executable(gooner)
-target_sources(gooner PRIVATE src/main.cpp src/cycle.cpp src/image.cpp src/fb.cpp src/glyph.cpp src/kb.cpp)
+target_sources(gooner PRIVATE src/main.cpp src/cycle.cpp src/image.cpp src/fb.cpp src/glyph.cpp src/window.cpp src/kb.cpp)
 target_include_directories(gooner PRIVATE include)

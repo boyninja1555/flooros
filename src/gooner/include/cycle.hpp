@@ -7,6 +7,7 @@
 namespace Cycle
 {
     extern bool running;
+    extern bool mouse_l, mouse_m, mouse_r;
 
     bool init(std::vector<UI::Element> &elements, Framebuf &buf);
 
