@@ -16,7 +16,6 @@ SYS_BIN        := build/init
 SHELL_BIN      := build/sf
 BUTOOLS_BIN    := $(patsubst src/butools/%.c, build/butools/%, $(BUTOOLS_SRC))
 GOONER_BIN     := src/gooner/build
-#LIBFLOOR69_BIN := src/libfloor69/build
 DEPS           := $(shell find build -name "*.d" 2>/dev/null)
 
 .PHONY: all clean run run-dev run-iso
@@ -44,15 +43,10 @@ $(GOONER_BIN):
 	cmake -S src/gooner -B $(GOONER_BIN)
 	cmake --build $(GOONER_BIN)
 
-#$(LIBFLOOR69_BIN):
-#	cmake -S src/libfloor69 -B $(LIBFLOOR69_BIN)
-#	cmake --build $(LIBFLOOR69_BIN)
-
 build/butools/%: src/butools/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $< -o $@
 
-#initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN) $(LIBFLOOR69_BIN)
 initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	@echo "Packing initramfs..."
 	rm -rf rootfs
@@ -62,6 +56,9 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 # "Important" libraries
 	cp /lib/x86_64-linux-gnu/libnss_files.so.2 rootfs/lib/
 	cp /lib/x86_64-linux-gnu/libnss_dns.so.2 rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libstdc++.so* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libm.so* rootfs/lib/
+	cp /lib/x86_64-linux-gnu/libgcc_s.so* rootfs/lib/
 
 # Subprojects
 	cp $(SYS_BIN) rootfs/init
@@ -71,8 +68,6 @@ initramfs.img: $(SYS_BIN) $(SHELL_BIN) $(BUTOOLS_BIN) $(GOONER_BIN)
 	cp src/butools/src-h/* rootfs/bin-h/
 	cp $(GOONER_BIN)/gooner rootfs/bin/
 	cp src/gooner/help rootfs/bin-h/gooner
-#	cp $(LIBFLOOR69_BIN)/libfloor69.a rootfs/lib/
-#	cp src/libfloor69/include/libfloor69.h rootfs/lib/include/
 
 # RootFS source
 	cp -r rootfs-src/* rootfs/
