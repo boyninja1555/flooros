@@ -10,7 +10,7 @@
 #include <string>
 #include "glyph.hpp"
 
-UI::Element UI::rect(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, color_t color)
+UI::Element UI::rect(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, color_t color)
 {
     UI::Element element = {.type = UI::Element::Type::RECT, .x = x, .y = y};
     element.rect.w = w;
@@ -19,7 +19,7 @@ UI::Element UI::rect(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uin
     return element;
 }
 
-UI::Element UI::image(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, color_t *data)
+UI::Element UI::image(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, color_t *data)
 {
     UI::Element element = {.type = UI::Element::Type::IMAGE, .x = x, .y = y};
     element.image.w = w;
@@ -28,7 +28,7 @@ UI::Element UI::image(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::ui
     return element;
 }
 
-UI::Element UI::text(std::uint32_t x, std::uint32_t y, char *text, color_t color)
+UI::Element UI::text(std::int32_t x, std::int32_t y, char *text, color_t color)
 {
     UI::Element element = {.type = UI::Element::Type::TEXT, .x = x, .y = y};
     element.text.text = text;
@@ -108,11 +108,14 @@ void Framebuf::px_clear(UI::color_t color)
 
 void Framebuf::px_plot(std::uint32_t x, std::uint32_t y, UI::color_t color)
 {
-    std::size_t offset = y * pitch + x * 4;
-    memback[offset] = color;
-    memback[offset + 1] = color >> 8;
-    memback[offset + 2] = color >> 16;
-    memback[offset + 3] = color >> 24;
+    if (x < width && y < height)
+    {
+        std::size_t offset = y * pitch + x * 4;
+        memback[offset] = color;
+        memback[offset + 1] = color >> 8;
+        memback[offset + 2] = color >> 16;
+        memback[offset + 3] = color >> 24;
+    }
 }
 
 void Framebuf::px_render(const UI::Element &element)

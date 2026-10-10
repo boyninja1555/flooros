@@ -3,6 +3,8 @@
 #include <linux/input.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <chrono>
+#include <thread>
 #include <vector>
 #include <iostream>
 #include "cycle.hpp"
@@ -51,10 +53,17 @@ int main()
 
     ioctl(fd_console, KDSETMODE, KD_GRAPHICS);
     struct input_event iev;
+
+    using namespace std::chrono_literals;
+    auto next = std::chrono::steady_clock::now();
+    constexpr auto frame_time = 16'666'667ns;
     while (Cycle::running)
     {
         Cycle::update(elements, buf, &iev, fd_keyboard, fd_mouse);
         Cycle::render(elements, buf);
+
+        next += frame_time;
+        std::this_thread::sleep_until(next);
     }
 
     Cycle::cleanup();

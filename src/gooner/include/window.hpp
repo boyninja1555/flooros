@@ -24,6 +24,7 @@ public:
 
 private:
     std::string title;
-    std::uint32_t x, y, w, h;
+    std::int32_t x, y;
+    std::uint32_t w, h;
     bool centered;
 };

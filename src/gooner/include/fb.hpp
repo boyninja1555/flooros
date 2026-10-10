@@ -36,7 +36,7 @@ namespace UI
             IMAGE,
             TEXT,
         } type;
-        std::uint32_t x, y;
+        std::int32_t x, y;
         union
         {
             ElementData::Text text;
@@ -45,11 +45,11 @@ namespace UI
         };
     };
 
-    Element rect(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, color_t color);
+    Element rect(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, color_t color);
 
-    Element image(std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, color_t *data);
+    Element image(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, color_t *data);
 
-    Element text(std::uint32_t x, std::uint32_t y, char *text, color_t color);
+    Element text(std::int32_t x, std::int32_t y, char *text, color_t color);
 };
 
 class Framebuf
