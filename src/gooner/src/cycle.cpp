@@ -1,10 +1,10 @@
 #include "cycle.hpp"
 #include <unistd.h>
 #include <cstring>
-#include <unordered_map>
+#include <thread>
 #include <iostream>
+#include "server.hpp"
 #include "glyph.hpp"
-#include "window.hpp"
 #include "image.hpp"
 
 #define TASKBAR_H 32
@@ -12,17 +12,14 @@
 static UI::color_t *logo24;
 static UI::color_t *cursor_img;
 
-static std::unordered_map<long, Window> windows;
 static UI::Element quitbtn;
+
+static GoonerServer::Instance server;
 
 bool Cycle::running = true;
 bool Cycle::mouse_l = false, Cycle::mouse_m = false, Cycle::mouse_r = false;
 UI::Element Cycle::cursor;
-
-static void window_close(long id)
-{
-    windows.erase(id);
-}
+std::unordered_map<long, Window> Cycle::windows;
 
 bool Cycle::init(std::vector<UI::Element> &elements, Framebuf &buf)
 {
@@ -79,7 +76,10 @@ bool Cycle::init(std::vector<UI::Element> &elements, Framebuf &buf)
     elements.push_back(temp_text3);
     elements.push_back(temp_text4);
 
-    windows.try_emplace(0L, 0L, window_close, "WELCOME", 0, 0, 800, 500, WINDOW_CENTERED);
+    server = GoonerServer::Instance();
+    std::thread threadsrv([]()
+                          { server.start(); });
+    threadsrv.detach();
     return true;
 }
 
@@ -87,6 +87,7 @@ void Cycle::cleanup()
 {
     std::free(logo24);
     std::free(cursor_img);
+    server.shutoff();
 }
 
 void Cycle::update(std::vector<UI::Element> &elements, Framebuf &buf, input_event *iev, int fd_keyboard, int fd_mouse)

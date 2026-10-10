@@ -7,7 +7,7 @@ static bool hovered = false;
 static bool moving = false;
 static std::uint32_t cursor_offx = 0, cursor_offy = 0;
 
-Window::Window(long id, std::function<void(long)> on_close, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), on_close(on_close), title(title), x(x), y(y), w(w), h(h)
+Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h)
 {
     centered = flags & WINDOW_CENTERED;
     needs_centering = centered;
@@ -15,6 +15,11 @@ Window::Window(long id, std::function<void(long)> on_close, std::string title, s
 
 Window::~Window()
 {
+}
+
+void Window::close()
+{
+    Cycle::windows.erase(id);
 }
 
 void Window::update(Framebuf &buf, const UI::Element &cursor)
@@ -57,7 +62,7 @@ void Window::render(Framebuf &buf)
     buf.el_update(close_button);
     buf.px_render(close_button);
     if (close_button.button.active)
-        on_close(id);
+        close();
 
     UI::Element pane = UI::rect(x, y + WINDOW_TITLE_H, w, h, WINDOW_PANE_COLOR);
     buf.px_render(pane);

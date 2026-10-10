@@ -15,9 +15,11 @@
 class Window
 {
 public:
-    Window(long id, std::function<void(long)> on_close, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
+    Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
 
     ~Window();
+
+    void close();
 
     void update(Framebuf &buf, const UI::Element &cursor);
 
@@ -25,7 +27,6 @@ public:
 
 private:
     long id;
-    std::function<void(long)> on_close;
     std::string title;
     std::int32_t x, y;
     std::uint32_t w, h;
