@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include "fb.hpp"
 
@@ -14,7 +15,7 @@
 class Window
 {
 public:
-    Window(std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
+    Window(long id, std::function<void(long)> on_close, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
 
     ~Window();
 
@@ -23,6 +24,8 @@ public:
     void render(Framebuf &buf);
 
 private:
+    long id;
+    std::function<void(long)> on_close;
     std::string title;
     std::int32_t x, y;
     std::uint32_t w, h;

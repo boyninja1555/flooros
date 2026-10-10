@@ -8,6 +8,7 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include "cycle.hpp"
 #include "glyph.hpp"
 
 UI::Element UI::rect(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, color_t color)
@@ -33,6 +34,17 @@ UI::Element UI::text(std::int32_t x, std::int32_t y, char *text, color_t color)
     UI::Element element = {.type = UI::Element::Type::TEXT, .x = x, .y = y};
     element.text.text = text;
     element.text.color = color;
+    return element;
+}
+
+UI::Element UI::button(std::int32_t x, std::int32_t y, std::uint32_t w, std::uint32_t h, char *text)
+{
+    UI::Element element = {.type = UI::Element::Type::BUTTON, .x = x, .y = y};
+    element.button.w = w;
+    element.button.h = h;
+    element.button.text = text;
+    element.button.hover = false;
+    element.button.active = false;
     return element;
 }
 
@@ -100,6 +112,20 @@ void Framebuf::size_get(std::uint32_t *w, std::uint32_t *h)
     *h = height;
 }
 
+void Framebuf::el_update(UI::Element &element)
+{
+    switch (element.type)
+    {
+    case UI::Element::Type::BUTTON:
+    {
+        element.button.active = (element.button.hover = Cycle::cursor.x >= element.x && Cycle::cursor.x <= element.x + element.button.w &&
+                                                        Cycle::cursor.y >= element.y && Cycle::cursor.y <= element.y + element.button.h) &&
+                                Cycle::mouse_l; // I know it's ugly but I... favor compact code? idfk FAJIFKHAWFNMFAWKAWF IT MUTATES LIKE 3 STATES gehehehHEeEHEHEHEHHEHEHHh
+        break;
+    }
+    }
+}
+
 void Framebuf::px_clear(UI::color_t color)
 {
     for (std::size_t i = 0; i < memsize; i += 4)
@@ -150,6 +176,17 @@ void Framebuf::px_render(const UI::Element &element)
                         px_plot(element.x + i * FONTC_WIDTH + col, element.y + row, element.text.color);
         }
 
+        break;
+    }
+
+    case UI::Element::Type::BUTTON:
+    {
+        UI::Element back = UI::rect(element.x, element.y, element.button.w, element.button.h, element.button.active ? UI_BUTTON_BACK_ACTIVE : (element.button.hover ? UI_BUTTON_BACK_HOVER : UI_BUTTON_BACK));
+        UI::Element fore = UI::text(element.x, element.y, element.button.text, UI_BUTTON_FORE);
+        fore.x += back.rect.w / 2 - FONTC_WIDTH * strlen(fore.text.text) / 2;
+        fore.y += back.rect.h / 2 - FONTC_WIDTH / 2;
+        px_render(back);
+        px_render(fore);
         break;
     }
     }
