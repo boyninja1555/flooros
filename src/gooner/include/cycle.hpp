@@ -20,4 +20,6 @@ namespace Cycle
     void update(std::vector<UI::Element> &elements, Framebuf &buf, input_event *iev, int fd_keyboard, int fd_mouse);
 
     void render(std::vector<UI::Element> &elements, Framebuf &buf);
+
+    void queue_window(Window &window);
 }

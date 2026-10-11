@@ -15,6 +15,8 @@
 class Window
 {
 public:
+    long id;
+
     Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
 
     ~Window();
@@ -26,7 +28,6 @@ public:
     void render(Framebuf &buf);
 
 private:
-    long id;
     std::string title;
     std::int32_t x, y;
     std::uint32_t w, h;

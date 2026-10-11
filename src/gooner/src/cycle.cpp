@@ -1,4 +1,5 @@
 #include "cycle.hpp"
+#include <spawn.h>
 #include <unistd.h>
 #include <cstring>
 #include <thread>
@@ -15,6 +16,7 @@ static UI::color_t *cursor_img;
 static UI::Element quitbtn;
 
 static GoonerServer::Instance server;
+static std::vector<Window> window_queue;
 
 bool Cycle::running = true;
 bool Cycle::mouse_l = false, Cycle::mouse_m = false, Cycle::mouse_r = false;
@@ -80,6 +82,10 @@ bool Cycle::init(std::vector<UI::Element> &elements, Framebuf &buf)
     std::thread threadsrv([]()
                           { server.start(); });
     threadsrv.detach();
+
+    char *welcome_argv[] = {const_cast<char *>("gooner"), const_cast<char *>("-welcome"), nullptr};
+    pid_t welcome_pid;
+    posix_spawn(&welcome_pid, "/bin/gooner", nullptr, nullptr, welcome_argv, environ);
     return true;
 }
 
@@ -92,6 +98,17 @@ void Cycle::cleanup()
 
 void Cycle::update(std::vector<UI::Element> &elements, Framebuf &buf, input_event *iev, int fd_keyboard, int fd_mouse)
 {
+    if (!window_queue.empty())
+    {
+        auto window_queue_cpy = std::vector<Window>(window_queue);
+        for (std::size_t i = window_queue_cpy.size(); i > 0; i--)
+        {
+            Window window = window_queue_cpy.at(i - 1);
+            windows.try_emplace(window.id, window);
+            window_queue.pop_back();
+        }
+    }
+
     if (read(fd_keyboard, iev, sizeof(*iev)) == (ssize_t)sizeof(*iev))
         ;
 
@@ -145,8 +162,8 @@ void Cycle::update(std::vector<UI::Element> &elements, Framebuf &buf, input_even
     for (std::size_t i = 0; i < elements.size(); i++)
         buf.el_update(elements.at(i));
     buf.el_update(quitbtn);
-    for (std::size_t i = 0; i < windows.size(); i++)
-        windows.at(i).update(buf, cursor);
+    for (auto &[id, window] : windows)
+        window.update(buf, cursor);
     running = !quitbtn.button.active;
 }
 
@@ -157,8 +174,13 @@ void Cycle::render(std::vector<UI::Element> &elements, Framebuf &buf)
     for (std::size_t i = 0; i < elements.size(); i++)
         buf.px_render(elements.at(i));
     buf.px_render(quitbtn);
-    for (std::size_t i = 0; i < windows.size(); i++)
-        windows.at(i).render(buf);
+    for (auto &[id, window] : windows)
+        window.render(buf);
     buf.px_render(cursor);
     buf.swap();
+}
+
+void Cycle::queue_window(Window &window)
+{
+    window_queue.push_back(window);
 }

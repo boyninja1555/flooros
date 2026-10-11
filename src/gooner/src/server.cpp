@@ -2,7 +2,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <cstdint>
 #include <cstring>
 #include <cstdio>
 #include <string>
@@ -60,19 +59,20 @@ void GoonerServer::Instance::start()
         }
 
         GoonerServer::Action action;
+        recv(client_fd, &action, sizeof(std::uint8_t), 0);
         switch (action)
         {
         case GoonerServer::Action::OPEN:
         {
-            size_t titlelen;
-            recv(client_fd, &titlelen, sizeof(size_t), 0);
+            std::size_t titlelen;
+            recv(client_fd, &titlelen, sizeof(std::size_t), 0);
 
-            std::string title;
-            title.resize_and_overwrite(50, [client_fd](char *titleptr, std::size_t maxlen) -> std::size_t
-                                       {
-                                        ssize_t received = recv(client_fd, titleptr, maxlen, 0);
-                                        if (received < 0) return 0; 
-                                        return static_cast<std::size_t>(received); });
+            std::string title(titlelen, '\0');
+            if (recv(client_fd, title.data(), titlelen, MSG_WAITALL) != static_cast<ssize_t>(titlelen))
+            {
+                close(client_fd);
+                continue;
+            }
 
             std::uint32_t x, y;
             recv(client_fd, &x, sizeof(std::uint32_t), 0);
@@ -85,7 +85,8 @@ void GoonerServer::Instance::start()
             std::uint8_t flags;
             recv(client_fd, &flags, sizeof(std::uint8_t), 0);
 
-            Cycle::windows.try_emplace(idc, idc, title, x, y, w, h, flags);
+            auto window = Window(idc, title, x, y, w, h, flags);
+            Cycle::queue_window(window);
             send(client_fd, &idc, sizeof(long), 0);
             idc++;
             break;

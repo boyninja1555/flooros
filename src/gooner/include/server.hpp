@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cstdint>
+
 #define GOONER_PORT 6969
 
 namespace GoonerServer
 {
-    enum Action
+    enum class Action : std::uint8_t
     {
         _NULL,
         OPEN,
