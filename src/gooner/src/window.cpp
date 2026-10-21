@@ -19,7 +19,7 @@ Window::~Window()
 
 void Window::close()
 {
-    Cycle::windows.erase(id);
+    Cycle::window_removal_queue.push_back(id);
 }
 
 void Window::update(Framebuf &buf, const UI::Element &cursor)

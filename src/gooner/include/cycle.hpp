@@ -12,6 +12,7 @@ namespace Cycle
     extern bool mouse_l, mouse_m, mouse_r;
     extern UI::Element cursor;
     extern std::unordered_map<long, Window> windows;
+    extern std::vector<long> window_removal_queue;
 
     bool init(std::vector<UI::Element> &elements, Framebuf &buf);
 

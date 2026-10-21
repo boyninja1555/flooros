@@ -22,6 +22,7 @@ bool Cycle::running = true;
 bool Cycle::mouse_l = false, Cycle::mouse_m = false, Cycle::mouse_r = false;
 UI::Element Cycle::cursor;
 std::unordered_map<long, Window> Cycle::windows;
+std::vector<long> Cycle::window_removal_queue;
 
 bool Cycle::init(std::vector<UI::Element> &elements, Framebuf &buf)
 {
@@ -98,6 +99,10 @@ void Cycle::cleanup()
 
 void Cycle::update(std::vector<UI::Element> &elements, Framebuf &buf, input_event *iev, int fd_keyboard, int fd_mouse)
 {
+    if (!window_removal_queue.empty())
+        for (long id : window_removal_queue)
+            windows.erase(id);
+
     if (!window_queue.empty())
     {
         auto window_queue_cpy = std::vector<Window>(window_queue);
