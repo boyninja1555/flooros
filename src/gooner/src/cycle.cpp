@@ -108,7 +108,7 @@ void Cycle::update(std::vector<UI::Element> &elements, Framebuf &buf, input_even
         auto window_queue_cpy = std::vector<Window>(window_queue);
         for (std::size_t i = window_queue_cpy.size(); i > 0; i--)
         {
-            Window window = window_queue_cpy.at(i - 1);
+            Window &window = window_queue_cpy.at(i - 1);
             windows.try_emplace(window.id, window);
             window_queue.pop_back();
         }

@@ -10,6 +10,7 @@
 #include <thread>
 #include <vector>
 #include <iostream>
+#include "socketpp.hpp"
 #include "cycle.hpp"
 #include "server.hpp"
 #include "fb.hpp"
@@ -56,23 +57,25 @@ int main(int argc, const char *argv[])
         }
 
         GoonerServer::Action action = GoonerServer::Action::OPEN;
-        send(client_fd, &action, sizeof(std::uint8_t), 0);
+        sendall(client_fd, &action, sizeof(std::uint8_t), 0);
 
         std::string title = "WELCOME";
         std::size_t titlelen = title.length();
-        send(client_fd, &titlelen, sizeof(std::size_t), 0);
-        send(client_fd, title.c_str(), titlelen, 0);
+        sendall(client_fd, &titlelen, sizeof(std::size_t), 0);
+        sendall(client_fd, title.c_str(), titlelen, 0);
 
         std::uint32_t x = 0, y = 0;
-        send(client_fd, &x, sizeof(std::uint32_t), 0);
-        send(client_fd, &y, sizeof(std::uint32_t), 0);
+        sendall(client_fd, &x, sizeof(std::uint32_t), 0);
+        sendall(client_fd, &y, sizeof(std::uint32_t), 0);
 
         std::uint32_t w = 800, h = 500;
-        send(client_fd, &w, sizeof(std::uint32_t), 0);
-        send(client_fd, &h, sizeof(std::uint32_t), 0);
+        sendall(client_fd, &w, sizeof(std::uint32_t), 0);
+        sendall(client_fd, &h, sizeof(std::uint32_t), 0);
 
         std::uint8_t flags = WINDOW_CENTERED;
-        send(client_fd, &flags, sizeof(std::uint8_t), 0);
+        sendall(client_fd, &flags, sizeof(std::uint8_t), 0);
+
+        close(client_fd);
         return 0;
     }
 

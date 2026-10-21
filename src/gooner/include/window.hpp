@@ -32,5 +32,9 @@ private:
     std::string title;
     std::int32_t x, y;
     std::uint32_t w, h;
+    std::uint32_t *winbuf;
     bool centered;
+
+    bool needs_centering;
+    bool hovered, moving;
 };

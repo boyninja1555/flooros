@@ -2,19 +2,22 @@
 #include "cycle.hpp"
 #include "glyph.hpp"
 
-static bool needs_centering = false;
-static bool hovered = false;
-static bool moving = false;
 static std::uint32_t cursor_offx = 0, cursor_offy = 0;
 
-Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h)
+Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h), needs_centering(false), hovered(false), moving(false)
 {
+    std::uint32_t winbuflen = sizeof(std::uint32_t) * w * h;
+    winbuf = static_cast<std::uint32_t *>(std::malloc(winbuflen));
+    for (std::uint32_t i = 0; i < w * h; i++)
+        winbuf[i] = WINDOW_PANE_COLOR;
+
     centered = flags & WINDOW_CENTERED;
     needs_centering = centered;
 }
 
 Window::~Window()
 {
+    std::free(winbuf);
 }
 
 void Window::close()
@@ -64,6 +67,6 @@ void Window::render(Framebuf &buf)
     if (close_button.button.active)
         close();
 
-    UI::Element pane = UI::rect(x, y + WINDOW_TITLE_H, w, h, WINDOW_PANE_COLOR);
+    UI::Element pane = UI::image(x, y + WINDOW_TITLE_H, w, h, winbuf);
     buf.px_render(pane);
 }
