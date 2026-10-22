@@ -12,6 +12,7 @@
 
 #define WINDOW_NOFLAGS 0b00000000
 #define WINDOW_CENTERED 0b00000001
+#define WINDOW_BORDERLESS 0b00000010
 
 class Window
 {
@@ -33,6 +34,7 @@ private:
     std::int32_t x, y;
     std::uint32_t w, h;
     bool centered;
+    bool borderless;
 
     bool needs_centering;
     bool hovered, moving;
