@@ -2,12 +2,9 @@
 #include "cycle.hpp"
 #include "glyph.hpp"
 
-static bool needs_centering = false;
-static bool hovered = false;
-static bool moving = false;
 static std::uint32_t cursor_offx = 0, cursor_offy = 0;
 
-Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h)
+Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h), needs_centering(false), hovered(false), moving(false)
 {
     centered = flags & WINDOW_CENTERED;
     needs_centering = centered;
