@@ -6,6 +6,8 @@ static std::uint32_t cursor_offx = 0, cursor_offy = 0;
 
 Window::Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags) : id(id), title(title), x(x), y(y), w(w), h(h), hovered(false), moving(false)
 {
+    winbuf.assign(w * h, WINDOW_PANE_COLOR);
+
     centered = flags & WINDOW_CENTERED;
     borderless = flags & WINDOW_BORDERLESS;
     needs_centering = centered;
@@ -68,6 +70,6 @@ void Window::render(Framebuf &buf)
             close();
     }
 
-    UI::Element pane = UI::rect(x, y + (borderless ? 0 : WINDOW_TITLE_H), w, h, WINDOW_PANE_COLOR);
+    UI::Element pane = UI::image(x, y + (borderless ? 0 : WINDOW_TITLE_H), w, h, winbuf.data());
     buf.px_render(pane);
 }

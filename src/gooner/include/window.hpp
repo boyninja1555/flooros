@@ -18,6 +18,10 @@ class Window
 {
 public:
     long id;
+    std::string title;
+    std::int32_t x, y;
+    std::uint32_t w, h;
+    std::vector<std::uint32_t> winbuf;
 
     Window(long id, std::string title, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, std::uint8_t flags);
 
@@ -30,9 +34,6 @@ public:
     void render(Framebuf &buf);
 
 private:
-    std::string title;
-    std::int32_t x, y;
-    std::uint32_t w, h;
     bool centered;
     bool borderless;
 

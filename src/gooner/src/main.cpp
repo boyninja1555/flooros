@@ -55,6 +55,7 @@ int main(int argc, const char *argv[])
             return 1;
         }
 
+        // Open
         GoonerServer::Action action = GoonerServer::Action::OPEN;
         send(client_fd, &action, sizeof(std::uint8_t), 0);
 
@@ -73,6 +74,23 @@ int main(int argc, const char *argv[])
 
         std::uint8_t flags = WINDOW_CENTERED;
         send(client_fd, &flags, sizeof(std::uint8_t), 0);
+
+        // ID
+        long id;
+        recv(client_fd, &id, sizeof(long), MSG_WAITALL);
+
+        // Paint
+        while (true)
+        {
+            action = GoonerServer::Action::PAINT;
+            send(client_fd, &action, sizeof(std::uint8_t), 0);
+            send(client_fd, &id, sizeof(long), 0);
+
+            std::vector<std::uint32_t> frame;
+            frame.assign(w * h, 0xFF000000);
+            send(client_fd, reinterpret_cast<char *>(frame.data()), sizeof(std::uint32_t) * frame.size(), 0);
+        }
+
         return 0;
     }
 

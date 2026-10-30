@@ -59,13 +59,13 @@ void GoonerServer::Instance::start()
         }
 
         GoonerServer::Action action;
-        recv(client_fd, &action, sizeof(std::uint8_t), 0);
+        recv(client_fd, &action, sizeof(std::uint8_t), MSG_WAITALL);
         switch (action)
         {
         case GoonerServer::Action::OPEN:
         {
             std::size_t titlelen;
-            recv(client_fd, &titlelen, sizeof(std::size_t), 0);
+            recv(client_fd, &titlelen, sizeof(std::size_t), MSG_WAITALL);
 
             std::string title(titlelen, '\0');
             if (recv(client_fd, title.data(), titlelen, MSG_WAITALL) != static_cast<ssize_t>(titlelen))
@@ -75,15 +75,15 @@ void GoonerServer::Instance::start()
             }
 
             std::uint32_t x, y;
-            recv(client_fd, &x, sizeof(std::uint32_t), 0);
-            recv(client_fd, &y, sizeof(std::uint32_t), 0);
+            recv(client_fd, &x, sizeof(std::uint32_t), MSG_WAITALL);
+            recv(client_fd, &y, sizeof(std::uint32_t), MSG_WAITALL);
 
             std::uint32_t w, h;
-            recv(client_fd, &w, sizeof(std::uint32_t), 0);
-            recv(client_fd, &h, sizeof(std::uint32_t), 0);
+            recv(client_fd, &w, sizeof(std::uint32_t), MSG_WAITALL);
+            recv(client_fd, &h, sizeof(std::uint32_t), MSG_WAITALL);
 
             std::uint8_t flags;
-            recv(client_fd, &flags, sizeof(std::uint8_t), 0);
+            recv(client_fd, &flags, sizeof(std::uint8_t), MSG_WAITALL);
 
             auto window = Window(idc, title, x, y, w, h, flags);
             Cycle::queue_window(window);
@@ -95,10 +95,21 @@ void GoonerServer::Instance::start()
         case GoonerServer::Action::CLOSE:
         {
             long id;
-            recv(client_fd, &id, sizeof(long), 0);
-            if (id < 0)
+            recv(client_fd, &id, sizeof(long), MSG_WAITALL);
+            if (id < 0 || !Cycle::windows.contains(id))
                 break;
             Cycle::windows.at(id).close();
+            break;
+        }
+
+        case GoonerServer::Action::PAINT:
+        {
+            long id;
+            recv(client_fd, &id, sizeof(long), MSG_WAITALL);
+            if (id < 0 || !Cycle::windows.contains(id))
+                break;
+            Window &window = Cycle::windows.at(id);
+            recv(client_fd, reinterpret_cast<char *>(window.winbuf.data()), sizeof(std::uint32_t) * window.winbuf.size(), MSG_WAITALL);
             break;
         }
         }

@@ -11,6 +11,7 @@ namespace GoonerServer
         _NULL,
         OPEN,
         CLOSE,
+        PAINT,
     };
 
     class Instance
