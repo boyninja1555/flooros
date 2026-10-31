@@ -26,5 +26,6 @@ namespace GoonerServer
         void shutoff();
 
     private:
+        bool running;
     };
 };

@@ -7,9 +7,7 @@
 #include <string>
 #include "cycle.hpp"
 
-static bool running = true;
-
-GoonerServer::Instance::Instance()
+GoonerServer::Instance::Instance() : running(false)
 {
 }
 
@@ -48,6 +46,7 @@ void GoonerServer::Instance::start()
         return;
     }
 
+    running = true;
     long idc = 0L;
     while (running)
     {
@@ -58,62 +57,68 @@ void GoonerServer::Instance::start()
             continue;
         }
 
-        GoonerServer::Action action;
-        recv(client_fd, &action, sizeof(std::uint8_t), MSG_WAITALL);
-        switch (action)
+        while (true)
         {
-        case GoonerServer::Action::OPEN:
-        {
-            std::size_t titlelen;
-            recv(client_fd, &titlelen, sizeof(std::size_t), MSG_WAITALL);
-
-            std::string title(titlelen, '\0');
-            if (recv(client_fd, title.data(), titlelen, MSG_WAITALL) != static_cast<ssize_t>(titlelen))
+            GoonerServer::Action action{};
+            ssize_t actionsize = recv(client_fd, &action, sizeof(std::uint8_t), MSG_WAITALL);
+            if (actionsize == 0 || actionsize != sizeof(action))
+                break;
+            switch (action)
             {
-                close(client_fd);
-                continue;
+            case GoonerServer::Action::OPEN:
+            {
+                std::size_t titlelen;
+                recv(client_fd, &titlelen, sizeof(std::size_t), MSG_WAITALL);
+
+                std::string title(titlelen, '\0');
+                if (recv(client_fd, title.data(), titlelen, MSG_WAITALL) != static_cast<ssize_t>(titlelen))
+                    break;
+
+                std::uint32_t x, y;
+                recv(client_fd, &x, sizeof(std::uint32_t), MSG_WAITALL);
+                recv(client_fd, &y, sizeof(std::uint32_t), MSG_WAITALL);
+
+                std::uint32_t w, h;
+                recv(client_fd, &w, sizeof(std::uint32_t), MSG_WAITALL);
+                recv(client_fd, &h, sizeof(std::uint32_t), MSG_WAITALL);
+
+                std::uint8_t flags;
+                recv(client_fd, &flags, sizeof(std::uint8_t), MSG_WAITALL);
+
+                auto window = Window(idc, title, x, y, w, h, flags);
+                Cycle::queue_window(window);
+                send(client_fd, &idc, sizeof(long), 0);
+                idc++;
+                break;
             }
 
-            std::uint32_t x, y;
-            recv(client_fd, &x, sizeof(std::uint32_t), MSG_WAITALL);
-            recv(client_fd, &y, sizeof(std::uint32_t), MSG_WAITALL);
-
-            std::uint32_t w, h;
-            recv(client_fd, &w, sizeof(std::uint32_t), MSG_WAITALL);
-            recv(client_fd, &h, sizeof(std::uint32_t), MSG_WAITALL);
-
-            std::uint8_t flags;
-            recv(client_fd, &flags, sizeof(std::uint8_t), MSG_WAITALL);
-
-            auto window = Window(idc, title, x, y, w, h, flags);
-            Cycle::queue_window(window);
-            send(client_fd, &idc, sizeof(long), 0);
-            idc++;
-            break;
-        }
-
-        case GoonerServer::Action::CLOSE:
-        {
-            long id;
-            recv(client_fd, &id, sizeof(long), MSG_WAITALL);
-            if (id < 0 || !Cycle::windows.contains(id))
+            case GoonerServer::Action::CLOSE:
+            {
+                long id;
+                recv(client_fd, &id, sizeof(long), MSG_WAITALL);
+                if (id < 0 || !Cycle::windows.contains(id))
+                    break;
+                Cycle::windows.at(id).close();
                 break;
-            Cycle::windows.at(id).close();
-            break;
-        }
+            }
 
-        case GoonerServer::Action::PAINT:
-        {
-            long id;
-            recv(client_fd, &id, sizeof(long), MSG_WAITALL);
-            if (id < 0 || !Cycle::windows.contains(id))
+            case GoonerServer::Action::PAINT:
+            {
+                long id;
+                recv(client_fd, &id, sizeof(long), MSG_WAITALL);
+                if (id < 0 || !Cycle::windows.contains(id))
+                    break;
+
+                Window &window = Cycle::windows.at(id);
+                recv(client_fd, reinterpret_cast<char *>(window.winbuf.data()), sizeof(std::uint32_t) * window.winbuf.size(), MSG_WAITALL);
                 break;
-            Window &window = Cycle::windows.at(id);
-            recv(client_fd, reinterpret_cast<char *>(window.winbuf.data()), sizeof(std::uint32_t) * window.winbuf.size(), MSG_WAITALL);
-            break;
-        }
-        }
+            }
 
+            default:
+                goto cdone;
+            }
+        }
+    cdone:
         close(client_fd);
     }
 
